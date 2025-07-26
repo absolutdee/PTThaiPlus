@@ -44,7 +44,7 @@ jobs:
               }
             }
             EOL
-          fi
+          if
 
       - name: Install dependencies
         run: |
