@@ -43,7 +43,7 @@ jobs:
                 "eject": "react-scripts eject"
               }
             }
-            EOL
+EOL
           fi
 
       - name: Install dependencies
