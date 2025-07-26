@@ -1,170 +1,192 @@
+// server/index.js - Quick Backend Server for FitConnect
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const fs = require('fs');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://absolutdee.github.io'] 
-    : ['http://localhost:3000'],
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true
 }));
-
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Static files for production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../build')));
-}
-
-// Import routes
-const authRoutes = require('./routes/auth');
-const trainerRoutes = require('./routes/trainers');
-const clientRoutes = require('./routes/clients');
-const sessionRoutes = require('./routes/sessions');
-const packageRoutes = require('./routes/packages');
-const reviewRoutes = require('./routes/reviews');
-const articleRoutes = require('./routes/articles');
-const eventRoutes = require('./routes/events');
-const gymRoutes = require('./routes/gyms');
-const uploadRoutes = require('./routes/upload');
-const adminRoutes = require('./routes/admin');
-const notificationRoutes = require('./routes/notifications');
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    message: 'FitConnect Backend is running!', 
+  res.json({
+    message: 'FitConnect Backend is running! 🚀',
     status: 'OK',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
     version: '1.0.0'
   });
 });
 
+// Mock data
+const mockTrainers = [
+  {
+    id: 1,
+    name: 'จอห์น ทรัพย์สิน',
+    specialty: 'Weight Training',
+    location: 'กรุงเทพมหานคร',
+    rating: 4.8,
+    reviews: 125,
+    price: 1500,
+    image: '/images/trainers/trainer1.jpg',
+    featured: true,
+    experience: 5,
+    certifications: ['ACSM', 'NASM'],
+    bio: 'เทรนเนอร์มืออาชีพด้วยประสบการณ์ 5 ปี เชี่ยวชาญด้าน Weight Training และ Strength Building'
+  },
+  {
+    id: 2,
+    name: 'เจน ฟิตเนส',
+    specialty: 'Cardio & HIIT',
+    location: 'กรุงเทพมหานคร',
+    rating: 4.9,
+    reviews: 89,
+    price: 1200,
+    image: '/images/trainers/trainer2.jpg',
+    featured: false,
+    experience: 3,
+    certifications: ['ACE', 'HIIT Certified'],
+    bio: 'ผู้เชี่ยวชาญด้าน Cardio และ HIIT ที่จะช่วยให้คุณเผาผลาญไขมันได้อย่างมีประสิทธิภาพ'
+  },
+  {
+    id: 3,
+    name: 'ไมค์ โยคะ',
+    specialty: 'Yoga & Pilates',
+    location: 'เชียงใหม่',
+    rating: 4.7,
+    reviews: 67,
+    price: 1000,
+    image: '/images/trainers/trainer3.jpg',
+    featured: true,
+    experience: 7,
+    certifications: ['RYT-200', 'Pilates Mat Certified'],
+    bio: 'ครูโยคะและพิลาทิสที่จะช่วยเพิ่มความยืดหยุ่นและความแข็งแรงของกล้ามเนื้อแกนกลาง'
+  },
+  {
+    id: 4,
+    name: 'แซม ฟิตเนส',
+    specialty: 'Functional Training',
+    location: 'ภูเก็ต',
+    rating: 4.6,
+    reviews: 95,
+    price: 1300,
+    image: '/images/trainers/trainer4.jpg',
+    featured: false,
+    experience: 4,
+    certifications: ['NASM', 'FMS'],
+    bio: 'เชี่ยวชาญด้าน Functional Training เพื่อการเคลื่อนไหวที่ดีขึ้นในชีวิตประจำวัน'
+  }
+];
+
+const mockArticles = [
+  {
+    id: 1,
+    title: '5 ท่าออกกำลังกายง่ายๆ ที่บ้าน',
+    excerpt: 'ท่าออกกำลังกายที่ไม่ต้องใช้อุปกรณ์ สามารถทำได้ที่บ้าน เหมาะสำหรับผู้เริ่มต้น',
+    content: 'เนื้อหาบทความเกี่ยวกับการออกกำลังกายที่บ้าน...',
+    image: '/images/articles/article1.jpg',
+    author: 'ทีมงาน FitConnect',
+    publishedAt: '2024-07-26T10:00:00Z',
+    category: 'exercise',
+    tags: ['ออกกำลังกาย', 'ที่บ้าน', 'ผู้เริ่มต้น'],
+    readTime: 5
+  },
+  {
+    id: 2,
+    title: 'โภชนาการสำหรับนักกีฬา',
+    excerpt: 'อาหารที่ควรทานก่อนและหลังออกกำลังกาย เพื่อประสิทธิภาพสูงสุด',
+    content: 'เนื้อหาบทความเกี่ยวกับโภชนาการ...',
+    image: '/images/articles/article2.jpg',
+    author: 'นักโภชนาการ สมใจ',
+    publishedAt: '2024-07-25T14:30:00Z',
+    category: 'nutrition',
+    tags: ['โภชนาการ', 'นักกีฬา', 'อาหาร'],
+    readTime: 8
+  },
+  {
+    id: 3,
+    title: 'การพักผ่อนและการฟื้นฟูกล้ามเนื้อ',
+    excerpt: 'ความสำคัญของการพักผ่อนและวิธีการฟื้นฟูกล้ามเนื้อหลังออกกำลังกาย',
+    content: 'เนื้อหาบทความเกี่ยวกับการฟื้นฟู...',
+    image: '/images/articles/article3.jpg',
+    author: 'ดร.สุขภาพ',
+    publishedAt: '2024-07-24T16:15:00Z',
+    category: 'recovery',
+    tags: ['การพักผ่อน', 'ฟื้นฟู', 'กล้ามเนื้อ'],
+    readTime: 6
+  }
+];
+
+const mockEvents = [
+  {
+    id: 1,
+    title: 'FitConnect Marathon 2024',
+    description: 'งานวิ่งมาราธอนประจำปี รวมพลคนรักสุขภาพ',
+    date: '2024-12-15T06:00:00Z',
+    location: 'สวนลุมพินี กรุงเทพมหานคร',
+    image: '/images/events/marathon.jpg',
+    price: 500,
+    category: 'running',
+    participants: 250,
+    maxParticipants: 500
+  },
+  {
+    id: 2,
+    title: 'Yoga in the Park',
+    description: 'เซสชั่นโยคะในสวนสาธารณะ ผ่อนคลายกับธรรมชาติ',
+    date: '2024-08-10T07:00:00Z',
+    location: 'สวนจตุจักร กรุงเทพมหานคร',
+    image: '/images/events/yoga-park.jpg',
+    price: 0,
+    category: 'yoga',
+    participants: 45,
+    maxParticipants: 100
+  }
+];
+
+const mockGyms = [
+  {
+    id: 1,
+    name: 'FitZone Gym',
+    address: '123 ถนนสุขุมวิท กรุงเทพมหานคร',
+    phone: '02-123-4567',
+    rating: 4.5,
+    amenities: ['Weight Training', 'Cardio', 'Swimming Pool', 'Sauna'],
+    openingHours: '05:00 - 23:00',
+    priceRange: '1500-3000',
+    image: '/images/gyms/fitzone.jpg',
+    latitude: 13.7563,
+    longitude: 100.5018
+  },
+  {
+    id: 2,
+    name: 'PowerHouse Fitness',
+    address: '456 ถนนพระราม 4 กรุงเทพมหานคร',
+    phone: '02-234-5678',
+    rating: 4.7,
+    amenities: ['CrossFit', 'Functional Training', 'Personal Training'],
+    openingHours: '06:00 - 22:00',
+    priceRange: '2000-4000',
+    image: '/images/gyms/powerhouse.jpg',
+    latitude: 13.7441,
+    longitude: 100.5389
+  }
+];
+
 // API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/trainers', trainerRoutes);
-app.use('/api/clients', clientRoutes);
-app.use('/api/sessions', sessionRoutes);
-app.use('/api/packages', packageRoutes);
-app.use('/api/reviews', reviewRoutes);
-app.use('/api/articles', articleRoutes);
-app.use('/api/events', eventRoutes);
-app.use('/api/gyms', gymRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/notifications', notificationRoutes);
-
-// Newsletter endpoint
-app.post('/api/newsletter/subscribe', (req, res) => {
-  const { email, source = 'website' } = req.body;
-  
-  console.log('📰 Newsletter subscription:', {
-    email,
-    source,
-    timestamp: new Date().toISOString()
-  });
-
-  // TODO: Save to database
-  // For now, just simulate success
-  res.json({ 
-    success: true, 
-    message: 'สมัครรับข่าวสารเรียบร้อยแล้ว!',
-    data: { email, subscribed_at: new Date().toISOString() }
-  });
-});
-
-// Contact form endpoint
-app.post('/api/contact', (req, res) => {
-  const { name, email, subject, message } = req.body;
-  
-  console.log('📧 Contact form submission:', {
-    name, email, subject, message,
-    timestamp: new Date().toISOString()
-  });
-
-  // TODO: Send email or save to database
-  
-  res.json({ 
-    success: true, 
-    message: 'ข้อความของคุณถูกส่งเรียบร้อยแล้ว เราจะติดต่อกลับในเร็วๆ นี้',
-    data: { submitted_at: new Date().toISOString() }
-  });
-});
-
-// ===============================
-// API Routes สำหรับ FitConnect
-// ===============================
-
-// Trainers API
 app.get('/api/trainers', (req, res) => {
-  const { search, specialty, location, rating } = req.query;
-  
-  // Mock data สำหรับ demo
-  const mockTrainers = [
-    {
-      id: 1,
-      name: 'จอห์น ทรัพย์สิน',
-      specialty: 'Weight Training',
-      location: 'กรุงเทพมหานคร',
-      rating: 4.8,
-      reviews: 125,
-      price: 1500,
-      image: '/images/trainers/trainer1.jpg',
-      featured: true,
-      experience: 5,
-      certifications: ['ACSM', 'NASM']
-    },
-    {
-      id: 2,
-      name: 'เจน ฟิตเนส',
-      specialty: 'Cardio & HIIT',
-      location: 'กรุงเทพมหานคร',
-      rating: 4.9,
-      reviews: 89,
-      price: 1200,
-      image: '/images/trainers/trainer2.jpg',
-      featured: false,
-      experience: 3,
-      certifications: ['ACE', 'HIIT Certified']
-    },
-    {
-      id: 3,
-      name: 'ไมค์ โยคะ',
-      specialty: 'Yoga & Pilates',
-      location: 'เชียงใหม่',
-      rating: 4.7,
-      reviews: 67,
-      price: 1000,
-      image: '/images/trainers/trainer3.jpg',
-      featured: true,
-      experience: 7,
-      certifications: ['RYT-200', 'Pilates Mat']
-    }
-  ];
+  const { search, specialty, location, featured } = req.query;
+  let filteredTrainers = [...mockTrainers];
 
-  let filteredTrainers = mockTrainers;
-
-  // Apply filters
   if (search) {
     filteredTrainers = filteredTrainers.filter(trainer => 
-      trainer.name.toLowerCase().includes(search.toLowerCase()) ||
+      trainer.name.includes(search) || 
       trainer.specialty.toLowerCase().includes(search.toLowerCase())
     );
   }
@@ -177,245 +199,173 @@ app.get('/api/trainers', (req, res) => {
 
   if (location) {
     filteredTrainers = filteredTrainers.filter(trainer => 
-      trainer.location.toLowerCase().includes(location.toLowerCase())
+      trainer.location.includes(location)
     );
   }
 
-  if (rating) {
-    filteredTrainers = filteredTrainers.filter(trainer => 
-      trainer.rating >= parseFloat(rating)
-    );
+  if (featured === 'true') {
+    filteredTrainers = filteredTrainers.filter(trainer => trainer.featured);
   }
 
-  res.json({ 
-    trainers: filteredTrainers,
-    total: filteredTrainers.length,
-    page: 1,
-    limit: 10
+  res.json({
+    success: true,
+    data: filteredTrainers,
+    total: filteredTrainers.length
   });
 });
 
-// Get single trainer
+app.get('/api/trainers/featured', (req, res) => {
+  const featuredTrainers = mockTrainers.filter(trainer => trainer.featured);
+  res.json({
+    success: true,
+    data: featuredTrainers
+  });
+});
+
 app.get('/api/trainers/:id', (req, res) => {
-  const trainerId = parseInt(req.params.id);
-  
-  // Mock trainer detail
-  const trainerDetail = {
-    id: trainerId,
-    name: 'จอห์น ทรัพย์สิน',
-    specialty: 'Weight Training & Muscle Building',
-    location: 'กรุงเทพมหานคร',
-    rating: 4.8,
-    reviews: 125,
-    price: 1500,
-    image: '/images/trainers/trainer1.jpg',
-    gallery: [
-      '/images/trainers/trainer1-1.jpg',
-      '/images/trainers/trainer1-2.jpg',
-      '/images/trainers/trainer1-3.jpg'
-    ],
-    bio: 'มีประสบการณ์ในการเป็นเทรนเนอร์มากกว่า 5 ปี เชี่ยวชาญในการสร้างกล้ามเนื้อและลดน้ำหนัก',
-    experience: 5,
-    certifications: ['ACSM', 'NASM', 'Nutrition Specialist'],
-    packages: [
-      {
-        id: 1,
-        name: 'Basic Package',
-        sessions: 8,
-        duration: '1 เดือน',
-        price: 12000,
-        features: ['8 เซสชั่นฝึกซ้อม', 'แผนการออกกำลังกาย', 'คำปรึกษาพื้นฐาน'],
-        recommended: false
-      },
-      {
-        id: 2,
-        name: 'Premium Package',
-        sessions: 16,
-        duration: '2 เดือน',
-        price: 20000,
-        features: ['16 เซสชั่นฝึกซ้อม', 'แผนการออกกำลังกาย', 'แผนโภชนาการ', 'การติดตาม 24/7'],
-        recommended: true
-      },
-      {
-        id: 3,
-        name: 'VIP Package',
-        sessions: 24,
-        duration: '3 เดือน',
-        price: 30000,
-        features: ['24 เซสชั่นฝึกซ้อม', 'แผนการออกกำลังกายแบบส่วนตัว', 'แผนโภชนาการครบวงจร', 'การติดตาม 24/7', 'ของขวัญพิเศษ'],
-        recommended: false
-      }
-    ],
-    schedule: {
-      monday: ['09:00-11:00', '14:00-16:00', '18:00-20:00'],
-      tuesday: ['09:00-11:00', '14:00-16:00'],
-      wednesday: ['09:00-11:00', '14:00-16:00', '18:00-20:00'],
-      thursday: ['09:00-11:00', '14:00-16:00'],
-      friday: ['09:00-11:00', '18:00-20:00'],
-      saturday: ['09:00-12:00'],
-      sunday: ['วันหยุด']
-    }
-  };
-
-  res.json(trainerDetail);
-});
-
-// Customers API
-app.get('/api/customers', (req, res) => {
-  res.json({ 
-    customers: [],
-    message: 'Customer endpoints coming soon'
+  const trainer = mockTrainers.find(t => t.id === parseInt(req.params.id));
+  if (!trainer) {
+    return res.status(404).json({
+      success: false,
+      message: 'Trainer not found'
+    });
+  }
+  res.json({
+    success: true,
+    data: trainer
   });
 });
 
-// Gyms API
-app.get('/api/gyms', (req, res) => {
-  const mockGyms = [
-    {
-      id: 1,
-      name: 'Fitness First',
-      location: 'สาทร, กรุงเทพฯ',
-      rating: 4.5,
-      image: '/images/gyms/gym1.jpg',
-      facilities: ['Weight Training', 'Cardio', 'Group Classes']
-    },
-    {
-      id: 2,
-      name: 'Virgin Active',
-      location: 'สุขุมวิท, กรุงเทพฯ',
-      rating: 4.7,
-      image: '/images/gyms/gym2.jpg',
-      facilities: ['Swimming Pool', 'Spa', 'Personal Training']
-    }
-  ];
-
-  res.json({ gyms: mockGyms });
-});
-
-// Articles API
 app.get('/api/articles', (req, res) => {
-  const mockArticles = [
-    {
-      id: 1,
-      title: '5 เทคนิคการออกกำลังกายที่มีประสิทธิภาพ',
-      excerpt: 'เรียนรู้เทคนิคการออกกำลังกายที่จะช่วยให้คุณได้ผลลัพธ์ที่ดีที่สุด',
-      image: '/images/articles/article1.jpg',
-      author: 'ทีมงาน FitConnect',
-      publishDate: '2024-01-15',
-      category: 'การออกกำลังกาย'
-    },
-    {
-      id: 2,
-      title: 'โภชนาการที่ถูกต้องสำหรับนักกีฬา',
-      excerpt: 'แนวทางการรับประทานอาหารที่เหมาะสมสำหรับคนที่ออกกำลังกายอย่างสม่ำเสมอ',
-      image: '/images/articles/article2.jpg',
-      author: 'นักโภชนาการ อันดา',
-      publishDate: '2024-01-10',
-      category: 'โภชนาการ'
-    }
-  ];
+  const { category, search } = req.query;
+  let filteredArticles = [...mockArticles];
 
-  res.json({ articles: mockArticles });
-});
+  if (category) {
+    filteredArticles = filteredArticles.filter(article => article.category === category);
+  }
 
-// Events API
-app.get('/api/events', (req, res) => {
-  const mockEvents = [
-    {
-      id: 1,
-      title: 'Marathon Bangkok 2024',
-      date: '2024-02-15',
-      location: 'ลุมพินี พาร์ค',
-      image: '/images/events/event1.jpg',
-      description: 'การแข่งขันวิ่งมาราธอนประจำปี 2024'
-    }
-  ];
+  if (search) {
+    filteredArticles = filteredArticles.filter(article => 
+      article.title.includes(search) || 
+      article.excerpt.includes(search)
+    );
+  }
 
-  res.json({ events: mockEvents });
-});
-
-// Contact API
-app.post('/api/contact', (req, res) => {
-  const { name, email, subject, message } = req.body;
-  
-  console.log('📧 Contact form submission:', {
-    name, email, subject, message,
-    timestamp: new Date().toISOString()
+  res.json({
+    success: true,
+    data: filteredArticles,
+    total: filteredArticles.length
   });
+});
 
-  // TODO: Send email or save to database
-  
-  res.json({ 
-    success: true, 
-    message: 'ข้อความของคุณถูกส่งเรียบร้อยแล้ว เราจะติดต่อกลับในเร็วๆ นี้' 
+app.get('/api/articles/:id', (req, res) => {
+  const article = mockArticles.find(a => a.id === parseInt(req.params.id));
+  if (!article) {
+    return res.status(404).json({
+      success: false,
+      message: 'Article not found'
+    });
+  }
+  res.json({
+    success: true,
+    data: article
+  });
+});
+
+app.get('/api/events', (req, res) => {
+  const { category, upcoming } = req.query;
+  let filteredEvents = [...mockEvents];
+
+  if (category) {
+    filteredEvents = filteredEvents.filter(event => event.category === category);
+  }
+
+  if (upcoming === 'true') {
+    const now = new Date();
+    filteredEvents = filteredEvents.filter(event => new Date(event.date) > now);
+  }
+
+  res.json({
+    success: true,
+    data: filteredEvents,
+    total: filteredEvents.length
+  });
+});
+
+app.get('/api/gyms', (req, res) => {
+  const { search, amenity } = req.query;
+  let filteredGyms = [...mockGyms];
+
+  if (search) {
+    filteredGyms = filteredGyms.filter(gym => 
+      gym.name.includes(search) || 
+      gym.address.includes(search)
+    );
+  }
+
+  if (amenity) {
+    filteredGyms = filteredGyms.filter(gym => 
+      gym.amenities.some(a => a.toLowerCase().includes(amenity.toLowerCase()))
+    );
+  }
+
+  res.json({
+    success: true,
+    data: filteredGyms,
+    total: filteredGyms.length
   });
 });
 
 // Newsletter subscription
-app.post('/api/newsletter', (req, res) => {
+app.post('/api/newsletter/subscribe', (req, res) => {
   const { email } = req.body;
+  console.log('📧 Newsletter subscription:', email);
   
-  console.log('📰 Newsletter subscription:', email);
-  
-  // TODO: Add to newsletter database
-  
-  res.json({ 
-    success: true, 
-    message: 'สมัครรับข่าวสารเรียบร้อยแล้ว!' 
+  res.json({
+    success: true,
+    message: 'สมัครรับข่าวสารเรียบร้อยแล้ว!'
   });
 });
 
-// ===============================
-// Error handling
-// ===============================
-app.use((req, res, next) => {
-  res.status(404).json({ 
-    error: 'Endpoint not found',
-    path: req.path,
-    method: req.method
+// Contact form
+app.post('/api/contact', (req, res) => {
+  const { name, email, subject, message } = req.body;
+  console.log('📞 Contact form:', { name, email, subject });
+  
+  res.json({
+    success: true,
+    message: 'ข้อความของคุณถูกส่งเรียบร้อยแล้ว เราจะติดต่อกลับในเร็วๆ นี้'
   });
 });
 
-app.use((err, req, res, next) => {
-  console.error('❌ Server Error:', err.stack);
-  res.status(500).json({ 
-    error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong!'
+// 404 handler for API routes
+app.all('/api/*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `API endpoint ${req.method} ${req.path} not found`
   });
 });
-
-// Serve React app for production
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build/index.html'));
-  });
-}
 
 // Start server
-const server = app.listen(PORT, '127.0.0.1', () => {
-  console.log(`🚀 FitConnect Server running on http://localhost:${PORT}`);
-  console.log(`🎯 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📝 API Documentation: http://localhost:${PORT}/api/health`);
-  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-});
-
-// Handle server errors
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.log(`❌ Port ${PORT} is already in use`);
-    console.log(`💡 Try running: npx kill-port ${PORT}`);
-    process.exit(1);
-  } else {
-    console.error('❌ Server error:', err);
-  }
+app.listen(PORT, () => {
+  console.log('🚀 =================================');
+  console.log(`📱 FitConnect Backend Server Started!`);
+  console.log(`🌐 Server: http://localhost:${PORT}`);
+  console.log(`📋 API Health: http://localhost:${PORT}/api/health`);
+  console.log(`👨‍⚕️ Trainers: http://localhost:${PORT}/api/trainers`);
+  console.log(`📰 Articles: http://localhost:${PORT}/api/articles`);
+  console.log(`🎯 Events: http://localhost:${PORT}/api/events`);
+  console.log(`🏋️ Gyms: http://localhost:${PORT}/api/gyms`);
+  console.log('🚀 =================================');
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('👋 SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    console.log('💤 Process terminated');
-  });
+  process.exit(0);
 });
 
-module.exports = app;
+process.on('SIGINT', () => {
+  console.log('👋 SIGINT received, shutting down gracefully');
+  process.exit(0);
+});

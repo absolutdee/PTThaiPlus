@@ -214,6 +214,12 @@ const SignUpPage = lazy(() =>
   }))
 );
 
+const ForgotPasswordPage = lazy(() => 
+  import('./components/main/ForgotPasswordPage').catch(() => ({
+    default: () => <div className="container mt-5"><h2>📝 Sign Up (Coming Soon)</h2></div>
+  }))
+);
+
 function App() {
   return (
     <ErrorBoundary>
@@ -232,6 +238,7 @@ function App() {
                 <Route path="contact" element={<ContactPage />} />
                 <Route path="signin" element={<SignInPage />} />
                 <Route path="signup" element={<SignUpPage />} />
+                <Route path="forgotpassword" element={<ForgotPasswordPage />} />
               </Route>
               
               {/* Fallback Route */}

@@ -1,8 +1,7 @@
-// public/manifest.json
 {
   "short_name": "FitConnect",
-  "name": "FitConnect - แพลตฟอร์มหาเทรนเนอร์ออกกำลังกาย",
-  "description": "พบเทรนเนอร์ออกกำลังกายมืออาชีพ จองเซสชั่นได้ง่าย ราคาโปร่งใส",
+  "name": "FitConnect - ค้นหาเทรนเนอร์ออกกำลังกาย",
+  "description": "แพลตฟอร์มค้นหาเทรนเนอร์ออกกำลังกายที่ดีที่สุดในประเทศไทย เชื่อมต่อคุณกับเทรนเนอร์มืออาชีพ",
   "icons": [
     {
       "src": "favicon.ico",
@@ -18,30 +17,122 @@
       "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "icons/icon-72x72.png",
+      "type": "image/png",
+      "sizes": "72x72"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "type": "image/png",
+      "sizes": "152x152"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "type": "image/png",
+      "sizes": "384x384"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "theme_color": "#232956",
   "background_color": "#ffffff",
-  "orientation": "portrait-primary",
   "scope": "/",
   "lang": "th",
-  "categories": ["health", "fitness", "lifestyle"],
+  "dir": "ltr",
+  "categories": ["health", "fitness", "lifestyle", "sports"],
+  "screenshots": [
+    {
+      "src": "screenshots/desktop-home.png",
+      "type": "image/png",
+      "sizes": "1280x720",
+      "form_factor": "wide",
+      "label": "หน้าแรก FitConnect"
+    },
+    {
+      "src": "screenshots/mobile-trainers.png",
+      "type": "image/png", 
+      "sizes": "375x812",
+      "form_factor": "narrow",
+      "label": "รายการเทรนเนอร์"
+    }
+  ],
   "shortcuts": [
     {
       "name": "ค้นหาเทรนเนอร์",
       "short_name": "ค้นหา",
       "description": "ค้นหาเทรนเนอร์ในพื้นที่ของคุณ",
-      "url": "/search",
-      "icons": [{ "src": "/icons/search-96x96.png", "sizes": "96x96" }]
+      "url": "/trainers",
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
-      "name": "Dashboard",
-      "short_name": "แดชบอร์ด",
-      "description": "เข้าสู่แดชบอร์ดของคุณ",
-      "url": "/dashboard",
-      "icons": [{ "src": "/icons/dashboard-96x96.png", "sizes": "96x96" }]
+      "name": "บทความ",
+      "short_name": "บทความ",
+      "description": "อ่านบทความเกี่ยวกับสุขภาพและฟิตเนส",
+      "url": "/articles",
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "ยิมใกล้เคียง",
+      "short_name": "ยิม",
+      "description": "ค้นหายิมและฟิตเนสใกล้เคียง",
+      "url": "/gyms",
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
     }
-  ]
+  ],
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.fitconnect.app",
+      "id": "com.fitconnect.app"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/fitconnect/id123456789"
+    }
+  ],
+  "prefer_related_applications": false
 }

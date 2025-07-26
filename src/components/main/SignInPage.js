@@ -572,7 +572,7 @@ const SignInPage = () => {
 
   // Forgot password
   const showForgotPassword = () => {
-    navigate('/forgotpasswordpage');
+    navigate('/forgotpassword');
   };
 
   // Logout function (can be called from anywhere in the app)
