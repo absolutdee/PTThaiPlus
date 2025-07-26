@@ -1,0 +1,25 @@
+// public/robots.txt
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://fitconnect.com/sitemap.xml
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+# Allow important pages
+Allow: /
+Allow: /search
+Allow: /trainers/*
+Allow: /articles/*
+Allow: /events/*
+Allow: /gyms/*
+Allow: /about
+Allow: /contact
+
+# Crawl delay
+Crawl-delay: 1
