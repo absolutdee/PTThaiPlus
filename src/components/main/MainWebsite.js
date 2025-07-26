@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Calendar, Users, Activity, MessageSquare, Settings, Home, Search, MapPin, Star, ChevronRight, Menu, X, Clock, Award, TrendingUp, Heart, DollarSign, Book, Phone, Mail, Facebook, Instagram, Twitter, Youtube, Bell, User, LogOut, BarChart, ChevronDown, ArrowUp } from 'lucide-react';
-import logo from '../../images/logo-new2020.png';
-import logowhite from '../../images/logo-new2020-white.png';
+import logo from '../../assets/images/logo-new2020.png';
+import logowhite from '../../assets/images/logo-new2020-white.png';
 
 // Helper function สำหรับ API calls - แก้ไขให้รองรับ error handling ที่ดีขึ้น
 const apiCall = async (endpoint, options = {}) => {
@@ -425,28 +425,23 @@ const MainWebsite = () => {
     }
   };
 
-  const handleNewsletterSubscribe = async (email) => {
-    try {
-      const response = await apiCall('/newsletter/subscribe', {
-        method: 'POST',
-        skipAuth: true, // Newsletter subscription ไม่จำเป็นต้อง authenticate
-        body: JSON.stringify({ 
-          email: email.trim(),
-          source: 'website_footer',
-          subscribed_at: new Date().toISOString()
-        })
-      });
+const handleNewsletterSubscribe = async (email) => {
+  const response = await apiCall('/newsletter/subscribe', {
+    method: 'POST',
+    skipAuth: true,
+    body: JSON.stringify({ 
+      email: email.trim(),
+      source: 'website_footer',
+      subscribed_at: new Date().toISOString()
+    })
+  });
 
-      if (!response.success) {
-        throw new Error(response.message || 'Subscription failed');
-      }
+  if (!response.success) {
+    throw new Error(response.message || 'Subscription failed');
+  }
 
-      return response;
-    } catch (error) {
-      // Re-throw with proper error message
-      throw error;
-    }
-  };
+  return response;
+};
 
   // Handle scroll effect
   useEffect(() => {

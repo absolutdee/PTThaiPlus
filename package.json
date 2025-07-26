@@ -2,7 +2,7 @@
   "name": "fitconnect-frontend",
   "version": "1.0.0",
   "description": "FitConnect - เว็บไซต์ค้นหาเทรนเนอร์ออกกำลังกาย รองรับทุกขนาดหน้าจอ",
-  "homepage": "https://absolutdee.github.io/PTThaiPlus",
+  "homepage": ".",
   "bugs": {
     "url": "https://github.com/absolutdee/PTThaiPlus/issues"
   },
@@ -36,7 +36,19 @@
     "build:dev": "NODE_ENV=development npm run build",
     "analyze": "npm run build && npx serve -s build",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "server": "node server/index.js",
+    "server:dev": "nodemon server/index.js",
+    "dev": "concurrently --kill-others \"npm run server:dev\" \"npm run start:frontend\"",
+    "dev:prod": "concurrently --kill-others \"npm run server\" \"npm run start:frontend\"",
+    "start:frontend": "cross-env PORT=3000 react-scripts start",
+    "start:backend": "cross-env PORT=3001 node server/index.js",
+    "build:full": "npm run build && npm run server",
+    "heroku-postbuild": "npm run build",
+    "check-ports": "netstat -an | findstr :300",
+    "kill-ports": "npx kill-port 3000 3001",
+    "clean": "rm -rf node_modules package-lock.json",
+    "fresh-install": "npm run clean && npm install"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -47,7 +59,12 @@
     "lucide-react": "^0.279.0",
     "recharts": "^2.8.0",
     "sass": "^1.67.0",
-    "web-vitals": "^3.4.0"
+    "web-vitals": "^3.4.0",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "react-scripts": "5.0.1",
@@ -57,7 +74,11 @@
     "gh-pages": "^6.0.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0"
+    "@testing-library/user-event": "^13.5.0",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.7",
+    "cross-env": "^7.0.3",
+    "kill-port": "^2.0.1"
   },
   "browserslist": {
     "production": [

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import logo from '../../assets/images/logo.png';
+import logo from '../../assets/images/logo-new2020.png';
 import { Link, useNavigate } from 'react-router-dom';
 
 const SignInPage = () => {

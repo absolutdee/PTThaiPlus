@@ -1,4 +1,3 @@
-# .eslintrc.js
 module.exports = {
   env: {
     browser: true,
@@ -8,9 +7,8 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:jsx-a11y/recommended'
+    'react-app',
+    'react-app/jest'
   ],
   parserOptions: {
     ecmaFeatures: {
@@ -20,23 +18,18 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: [
-    'react',
-    'react-hooks',
-    'jsx-a11y'
+    'react'
   ],
   rules: {
-    'react/react-in-jsx-scope': 'off',
-    'react/prop-types': 'warn',
     'no-unused-vars': 'warn',
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'warn',
-    'jsx-a11y/no-onchange': 'off',
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn'
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off'
   },
-  settings: {
-    react: {
-      version: 'detect'
-    }
-  }
+  ignorePatterns: [
+    'build/',
+    'node_modules/',
+    'public/',
+    '*.min.js'
+  ]
 };

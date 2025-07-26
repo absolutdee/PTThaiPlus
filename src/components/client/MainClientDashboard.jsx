@@ -7,7 +7,7 @@ import {
   Dumbbell, Apple, LogOut, Gift, Ticket,
   Loader
 } from 'lucide-react';
-import logo from '../../assets/images/logo.png';
+import logo from '../../assets/images/logo-new2020.png';
 import { Link } from 'react-router-dom';
 
 // Import all client dashboard components

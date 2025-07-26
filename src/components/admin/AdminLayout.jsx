@@ -8,7 +8,7 @@ import {
   Headphones, Briefcase, Shield, Globe,
   Receipt, BarChart3, Bot, Ticket, LogOut
 } from 'lucide-react';
-import logo from '../../assets/images/logo.png';
+import logo from '../../assets/images/logo-new2020.png';
 import { Link } from 'react-router-dom';
 
 // Import page components

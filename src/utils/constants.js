@@ -1,119 +1,158 @@
-// src/utils/constants.js
-export const APP_CONFIG = {
-  APP_NAME: 'PT Thailand Plus',
-  APP_VERSION: '1.0.0',
-  APP_DESCRIPTION: 'แพลตฟอร์มหาเทรนเนอร์ออกกำลังกาย',
-  
-  // API Configuration
-  API_BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:3001/api',
-  API_TIMEOUT: 30000,
-  
-  // Authentication
-  TOKEN_KEY: 'authToken',
-  USER_KEY: 'userData',
-  REFRESH_TOKEN_KEY: 'refreshToken',
-  TOKEN_EXPIRE_TIME: 24 * 60 * 60 * 1000, // 24 hours
-  
-  // File Upload
-  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
-  ALLOWED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-  ALLOWED_DOCUMENT_TYPES: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
-  
-  // Pagination
-  DEFAULT_PAGE_SIZE: 10,
-  MAX_PAGE_SIZE: 100,
-  
-  // Maps
-  GOOGLE_MAPS_API_KEY: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-  
-  // Payment
-  STRIPE_PUBLIC_KEY: process.env.REACT_APP_STRIPE_PK,
-  
-  // Social Media
-  SOCIAL_LINKS: {
-    facebook: 'https://facebook.com/fitconnect',
-    instagram: 'https://instagram.com/fitconnect',
-    twitter: 'https://twitter.com/fitconnect',
-    line: 'https://line.me/ti/p/@fitconnect'
+/**
+ * Application Constants
+ * ค่าคงที่ต่างๆ ที่ใช้ในแอพพลิเคชัน
+ */
+
+// API Endpoints
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN: '/auth/login',
+    REGISTER: '/auth/register',
+    LOGOUT: '/auth/logout',
+    REFRESH: '/auth/refresh',
+    PROFILE: '/auth/profile',
+  },
+  TRAINERS: {
+    LIST: '/trainers',
+    DETAIL: '/trainers/:id',
+    SEARCH: '/trainers/search',
+    FEATURED: '/trainers/featured',
+  },
+  USERS: {
+    PROFILE: '/users/profile',
+    UPDATE: '/users/update',
+    AVATAR: '/users/avatar',
+  },
+  BOOKINGS: {
+    LIST: '/bookings',
+    CREATE: '/bookings',
+    DETAIL: '/bookings/:id',
+    CANCEL: '/bookings/:id/cancel',
+  },
+  ARTICLES: {
+    LIST: '/articles',
+    DETAIL: '/articles/:id',
+    CATEGORIES: '/articles/categories',
+  },
+  EVENTS: {
+    LIST: '/events',
+    DETAIL: '/events/:id',
+    REGISTER: '/events/:id/register',
+  },
+  GYMS: {
+    LIST: '/gyms',
+    DETAIL: '/gyms/:id',
+    SEARCH: '/gyms/search',
   }
 };
 
-export const USER_ROLES = {
-  ADMIN: 'admin',
-  TRAINER: 'trainer',
-  CLIENT: 'client'
+// App Configuration
+export const APP_CONFIG = {
+  NAME: 'FitConnect',
+  VERSION: '1.0.0',
+  DESCRIPTION: 'เชื่อมต่อคุณกับการออกกำลังกายที่ใช่',
+  AUTHOR: 'FitConnect Team',
+  HOMEPAGE: 'https://absolutdee.github.io/PTThaiPlus',
 };
 
-export const SESSION_STATUS = {
-  SCHEDULED: 'scheduled',
-  IN_PROGRESS: 'in_progress',
+// Theme Colors
+export const COLORS = {
+  PRIMARY: '#232956',
+  SECONDARY: '#df2528',
+  SUCCESS: '#28a745',
+  WARNING: '#ffc107',
+  DANGER: '#dc3545',
+  INFO: '#17a2b8',
+  LIGHT: '#f8f9fa',
+  DARK: '#343a40',
+  WHITE: '#ffffff',
+  GOLD: '#ffd700',
+};
+
+// User Roles
+export const USER_ROLES = {
+  CLIENT: 'client',
+  TRAINER: 'trainer',
+  ADMIN: 'admin',
+};
+
+// Trainer Specialties
+export const TRAINER_SPECIALTIES = {
+  WEIGHT_TRAINING: 'weight_training',
+  CARDIO: 'cardio',
+  YOGA: 'yoga',
+  PILATES: 'pilates',
+  CROSSFIT: 'crossfit',
+  BOXING: 'boxing',
+  FUNCTIONAL: 'functional',
+  NUTRITION: 'nutrition',
+};
+
+// Booking Status
+export const BOOKING_STATUS = {
+  PENDING: 'pending',
+  CONFIRMED: 'confirmed',
   COMPLETED: 'completed',
   CANCELLED: 'cancelled',
-  NO_SHOW: 'no_show'
+  NO_SHOW: 'no_show',
 };
 
+// Payment Status
 export const PAYMENT_STATUS = {
   PENDING: 'pending',
-  PROCESSING: 'processing',
-  COMPLETED: 'completed',
+  PAID: 'paid',
   FAILED: 'failed',
-  REFUNDED: 'refunded'
+  REFUNDED: 'refunded',
 };
 
-export const NOTIFICATION_TYPES = {
-  INFO: 'info',
-  SUCCESS: 'success',
-  WARNING: 'warning',
-  ERROR: 'error'
+// Local Storage Keys
+export const STORAGE_KEYS = {
+  AUTH_TOKEN: 'authToken',
+  USER_DATA: 'userData',
+  THEME: 'theme',
+  LANGUAGE: 'language',
+  CART: 'cart',
 };
 
-export const WORKOUT_CATEGORIES = [
-  { id: 'strength', name: 'ฝึกความแข็งแรง', icon: 'fas fa-dumbbell' },
-  { id: 'cardio', name: 'แอโรบิค', icon: 'fas fa-heartbeat' },
-  { id: 'flexibility', name: 'ความยืดหยุ่น', icon: 'fas fa-leaf' },
-  { id: 'yoga', name: 'โยคะ', icon: 'fas fa-om' },
-  { id: 'pilates', name: 'พิลาทิส', icon: 'fas fa-user-circle' },
-  { id: 'martial_arts', name: 'ศิลปะการต่อสู้', icon: 'fas fa-fist-raised' },
-  { id: 'sports', name: 'กีฬา', icon: 'fas fa-running' },
-  { id: 'dance', name: 'เต้นรำ', icon: 'fas fa-music' }
-];
+// Default Values
+export const DEFAULTS = {
+  PAGE_SIZE: 10,
+  MAX_UPLOAD_SIZE: 5 * 1024 * 1024, // 5MB
+  SUPPORTED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+  DEBOUNCE_DELAY: 300,
+  REQUEST_TIMEOUT: 10000,
+};
 
-export const THAI_PROVINCES = [
-  'กรุงเทพมหานคร', 'กระบี่', 'กาญจนบุรี', 'กาฬสินธุ์', 'กำแพงเพชร',
-  'ขอนแก่น', 'จันทบุรี', 'ฉะเชิงเทรา', 'ชลบุรี', 'ชัยนาท',
-  'ชัยภูมิ', 'ชุมพร', 'เชียงราย', 'เชียงใหม่', 'ตรัง',
-  'ตราด', 'ตาก', 'นครนายก', 'นครปฐม', 'นครพนม',
-  'นครราชสีมา', 'นครศรีธรรมราช', 'นครสวรรค์', 'นนทบุรี', 'นราธิวาส',
-  'น่าน', 'บึงกาฬ', 'บุรีรัมย์', 'ปทุมธานี', 'ประจวบคีรีขันธ์',
-  'ปราจีนบุรี', 'ปัตตานี', 'พระนครศรีอยุธยา', 'พังงา', 'พัทลุง',
-  'พิจิตร', 'พิษณุโลก', 'เพชรบุรี', 'เพชรบูรณ์', 'แพร่',
-  'ภูเก็ต', 'มหาสารคาม', 'มุกดาหาร', 'แม่ฮ่องสอน', 'ยโสธร',
-  'ยะลา', 'ร้อยเอ็ด', 'ระนอง', 'ระยอง', 'ราชบุรี',
-  'ลพบุรี', 'ลำปาง', 'ลำพูน', 'เลย', 'ศรีสะเกษ',
-  'สกลนคร', 'สงขลา', 'สตูล', 'สมุทรปราการ', 'สมุทรสงคราม',
-  'สมุทรสาคร', 'สระแก้ว', 'สระบุรี', 'สิงห์บุรี', 'สุโขทัย',
-  'สุพรรณบุรี', 'สุราษฎร์ธานี', 'สุรินทร์', 'หนองคาย', 'หนองบัวลำภู',
-  'อ่างทอง', 'อำนาจเจริญ', 'อุดรธานี', 'อุตรดิตถ์', 'อุทัยธานี',
-  'อุบลราชธานี'
-];
-
+// Error Messages
 export const ERROR_MESSAGES = {
-  NETWORK_ERROR: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่',
-  SERVER_ERROR: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์ กรุณาลองใหม่ภายหลัง',
+  NETWORK_ERROR: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่อีกครั้ง',
   UNAUTHORIZED: 'กรุณาเข้าสู่ระบบก่อนใช้งาน',
   FORBIDDEN: 'คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้',
   NOT_FOUND: 'ไม่พบข้อมูลที่ต้องการ',
   VALIDATION_ERROR: 'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง',
-  FILE_TOO_LARGE: 'ขนาดไฟล์เกินกำหนด',
-  INVALID_FILE_TYPE: 'ประเภทไฟล์ไม่ถูกต้อง'
+  SERVER_ERROR: 'เกิดข้อผิดพลาดในระบบ กรุณาติดต่อผู้ดูแลระบบ',
 };
 
+// Success Messages
 export const SUCCESS_MESSAGES = {
-  SAVE_SUCCESS: 'บันทึกข้อมูลเรียบร้อยแล้ว',
-  UPDATE_SUCCESS: 'อัปเดตข้อมูลเรียบร้อยแล้ว',
-  DELETE_SUCCESS: 'ลบข้อมูลเรียบร้อยแล้ว',
-  UPLOAD_SUCCESS: 'อัปโหลดไฟล์เรียบร้อยแล้ว',
-  EMAIL_SENT: 'ส่งอีเมลเรียบร้อยแล้ว',
-  BOOKING_SUCCESS: 'จองเซสชั่นเรียบร้อยแล้ว',
-  PAYMENT_SUCCESS: 'ชำระเงินเรียบร้อยแล้ว'
+  LOGIN_SUCCESS: 'เข้าสู่ระบบสำเร็จ',
+  REGISTER_SUCCESS: 'สมัครสมาชิกสำเร็จ',
+  UPDATE_SUCCESS: 'อัปเดตข้อมูลสำเร็จ',
+  DELETE_SUCCESS: 'ลบข้อมูลสำเร็จ',
+  BOOKING_SUCCESS: 'จองเซสชั่นสำเร็จ',
+  PAYMENT_SUCCESS: 'ชำระเงินสำเร็จ',
+};
+
+export default {
+  API_ENDPOINTS,
+  APP_CONFIG,
+  COLORS,
+  USER_ROLES,
+  TRAINER_SPECIALTIES,
+  BOOKING_STATUS,
+  PAYMENT_STATUS,
+  STORAGE_KEYS,
+  DEFAULTS,
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
 };

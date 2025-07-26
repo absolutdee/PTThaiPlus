@@ -5,7 +5,7 @@ import {
   Edit, LogOut, ChevronDown, Star, Ticket, AlertCircle, CheckCircle, 
   Clock, TrendingUp, RefreshCw, Wifi, WifiOff
 } from 'lucide-react';
-import logo from '../../assets/images/logo.png';
+import logo from '../../assets/images/logo-new2020.png';
 import { Link, useNavigate } from 'react-router-dom';
 
 // Import Context Provider - Updated with API integration

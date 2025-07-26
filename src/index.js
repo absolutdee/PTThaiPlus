@@ -1,92 +1,125 @@
-// src/index.js
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { initializeApp } from './utils/app-initializer';
-import { analyticsService } from './services/analytics';
-import { performanceMonitor } from './utils/performance';
 
-// Import global styles
-import './styles/main.scss';
+// Import CSS safely
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-// Report web vitals
-import reportWebVitals from './reportWebVitals';
+// Performance monitoring (optional)
+const reportWebVitals = (onPerfEntry) => {
+  if (onPerfEntry && onPerfEntry instanceof Function) {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(onPerfEntry);
+      getFID(onPerfEntry);
+      getFCP(onPerfEntry);
+      getLCP(onPerfEntry);
+      getTTFB(onPerfEntry);
+    }).catch(err => {
+      console.warn('Web Vitals not available:', err);
+    });
+  }
+};
 
-// Initialize performance monitoring
-performanceMonitor.startTiming('app-initialization');
+// Error handling for the entire app
+window.addEventListener('error', (event) => {
+  console.error('Global Error:', event.error);
+  // Send to analytics if needed
+  if (window.gtag) {
+    window.gtag('event', 'exception', {
+      description: event.error.toString(),
+      fatal: false
+    });
+  }
+});
 
-const container = document.getElementById('root');
-const root = createRoot(container);
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled Promise Rejection:', event.reason);
+  // Send to analytics if needed
+  if (window.gtag) {
+    window.gtag('event', 'exception', {
+      description: event.reason.toString(),
+      fatal: false
+    });
+  }
+});
 
-// Initialize app
-const initApp = async () => {
+// Safe DOM mounting
+function mountApp() {
+  const container = document.getElementById('root');
+  
+  if (!container) {
+    console.error('Root element not found');
+    return;
+  }
+
   try {
-    // Initialize app services
-    await initializeApp();
+    const root = createRoot(container);
     
-    // Initialize analytics
-    analyticsService.init({
-      trackingId: process.env.REACT_APP_GA_TRACKING_ID,
-      debug: process.env.NODE_ENV === 'development'
-    });
-
-    // End performance timing
-    performanceMonitor.endTiming('app-initialization');
-    
-    // Track app start
-    analyticsService.trackEvent('app_start', {
-      timestamp: Date.now(),
-      user_agent: navigator.userAgent,
-      viewport: `${window.innerWidth}x${window.innerHeight}`
-    });
-
-    // Render app
     root.render(
       <React.StrictMode>
         <App />
       </React.StrictMode>
     );
 
+    // Report performance metrics
+    reportWebVitals(console.log);
+
   } catch (error) {
-    console.error('Failed to initialize app:', error);
+    console.error('Failed to mount React app:', error);
     
-    // Show error page
-    root.render(
-      <div className="d-flex align-items-center justify-content-center min-vh-100">
-        <div className="text-center">
-          <h1 className="text-danger">เกิดข้อผิดพลาด</h1>
-          <p className="text-muted">ไม่สามารถเริ่มต้นแอปพลิเคชันได้</p>
+    // Fallback HTML content
+    container.innerHTML = `
+      <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background: linear-gradient(135deg, #232956 0%, #df2528 100%);
+        color: white;
+        text-align: center;
+      ">
+        <div style="
+          background: rgba(255, 255, 255, 0.1);
+          padding: 40px;
+          border-radius: 20px;
+          backdrop-filter: blur(10px);
+          max-width: 500px;
+        ">
+          <h1 style="margin-bottom: 20px; font-size: 3rem;">🏋️‍♂️</h1>
+          <h2 style="margin-bottom: 20px;">FitConnect</h2>
+          <p style="margin-bottom: 30px; opacity: 0.9;">
+            ขออภัย เกิดข้อผิดพลาดในการโหลดแอปพลิเคชัน
+          </p>
           <button 
-            className="btn btn-primary"
-            onClick={() => window.location.reload()}
+            onclick="window.location.reload()" 
+            style="
+              background: white;
+              color: #232956;
+              border: none;
+              padding: 15px 30px;
+              border-radius: 10px;
+              font-weight: bold;
+              cursor: pointer;
+              font-size: 16px;
+            "
           >
-            โหลดใหม่
+            🔄 โหลดหน้าใหม่
           </button>
         </div>
       </div>
-    );
+    `;
   }
-};
+}
 
-// Start app initialization
-initApp();
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mountApp);
+} else {
+  mountApp();
+}
 
-// Report web vitals
-reportWebVitals((metric) => {
-  analyticsService.trackPerformance(metric.name, metric.value);
-});
-
-// Handle app errors
-window.addEventListener('error', (event) => {
-  analyticsService.trackError(event.error, {
-    filename: event.filename,
-    lineno: event.lineno,
-    colno: event.colno
-  });
-});
-
-window.addEventListener('unhandledrejection', (event) => {
-  analyticsService.trackError(event.reason, {
-    type: 'unhandled_promise_rejection'
-  });
-});
+// Export for testing
+export default mountApp;
