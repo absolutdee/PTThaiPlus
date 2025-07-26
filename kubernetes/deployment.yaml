@@ -1,0 +1,44 @@
+# kubernetes/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fitconnect-frontend
+  labels:
+    app: fitconnect-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fitconnect-frontend
+  template:
+    metadata:
+      labels:
+        app: fitconnect-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: ghcr.io/fitconnect-frontend:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: NODE_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
