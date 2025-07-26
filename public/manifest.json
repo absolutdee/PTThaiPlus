@@ -1,0 +1,47 @@
+// public/manifest.json
+{
+  "short_name": "FitConnect",
+  "name": "FitConnect - แพลตฟอร์มหาเทรนเนอร์ออกกำลังกาย",
+  "description": "พบเทรนเนอร์ออกกำลังกายมืออาชีพ จองเซสชั่นได้ง่าย ราคาโปร่งใส",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "logo192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#232956",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "th",
+  "categories": ["health", "fitness", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "ค้นหาเทรนเนอร์",
+      "short_name": "ค้นหา",
+      "description": "ค้นหาเทรนเนอร์ในพื้นที่ของคุณ",
+      "url": "/search",
+      "icons": [{ "src": "/icons/search-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "แดชบอร์ด",
+      "description": "เข้าสู่แดชบอร์ดของคุณ",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icons/dashboard-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+}
