@@ -1,0 +1,182 @@
+// src/styles/variables.scss
+:root {
+  // Colors
+  --primary: #232956;
+  --secondary: #df2528;
+  --success: #28a745;
+  --warning: #ffc107;
+  --info: #17a2b8;
+  --danger: #dc3545;
+  --light: #f8f9fa;
+  --dark: #343a40;
+
+  // Background Colors
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+
+  // Text Colors
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #999999;
+  --text-white: #ffffff;
+
+  // Border
+  --border-color: #e9ecef;
+  --border-radius: 0.5rem;
+
+  // Shadows
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+  // Spacing
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  // Breakpoints
+  --bp-xs: 0;
+  --bp-sm: 576px;
+  --bp-md: 768px;
+  --bp-lg: 992px;
+  --bp-xl: 1200px;
+  --bp-xxl: 1400px;
+
+  // Z-index
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+
+  // Transitions
+  --transition-base: 0.3s ease;
+  --transition-fast: 0.15s ease;
+  --transition-slow: 0.5s ease;
+
+  // Fonts
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-family-heading: "Inter", var(--font-family-base);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  // Line Heights
+  --line-height-sm: 1.25;
+  --line-height-base: 1.5;
+  --line-height-lg: 1.75;
+}
+
+// Component-specific variables
+$navbar-height: 70px;
+$sidebar-width: 280px;
+$sidebar-width-collapsed: 70px;
+
+// Animation Variables
+$animation-duration-fast: 0.15s;
+$animation-duration-base: 0.3s;
+$animation-duration-slow: 0.5s;
+
+// Grid Variables
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1320px
+);
+
+// Dashboard specific variables
+:root {
+  --sidebar-width: 280px;
+  --sidebar-width-collapsed: 70px;
+  --header-height: 70px;
+  --mobile-header-height: 60px;
+  
+  // Dashboard colors
+  --dashboard-bg: #f5f7fa;
+  --sidebar-bg: var(--bg-primary);
+  --sidebar-text: var(--text-secondary);
+  --sidebar-active: var(--primary);
+  
+  // Card colors
+  --card-bg: var(--bg-primary);
+  --card-border: var(--border-color);
+  --card-shadow: var(--shadow-md);
+}
+
+// Component Mixins
+@mixin card-hover {
+  transition: all var(--transition-base);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+@mixin button-variant($bg, $border: $bg, $color: white) {
+  background-color: $bg;
+  border-color: $border;
+  color: $color;
+  
+  &:hover {
+    background-color: darken($bg, 10%);
+    border-color: darken($border, 10%);
+    color: $color;
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($bg, 0.25);
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin gradient-text($start, $end) {
+  background: linear-gradient(45deg, $start, $end);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// Responsive Mixins
+@mixin mobile-only {
+  @media (max-width: 767px) {
+    @content;
+  }
+}
+
+@mixin tablet-up {
+  @media (min-width: 768px) {
+    @content;
+  }
+}
+
+@mixin desktop-up {
+  @media (min-width: 992px) {
+    @content;
+  }
+}
+
+@mixin large-desktop-up {
+  @media (min-width: 1200px) {
+    @content;
+  }
+}
