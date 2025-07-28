@@ -1,11 +1,12 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { AuthProvider } from './contexts/AuthContext';
 
 // Import CSS safely
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// Performance monitoring (optional)
+// Performance monitoring (optional) - แก้ไขให้ safe
 const reportWebVitals = (onPerfEntry) => {
   if (onPerfEntry && onPerfEntry instanceof Function) {
     import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
@@ -57,7 +58,9 @@ function mountApp() {
     
     root.render(
       <React.StrictMode>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </React.StrictMode>
     );
 

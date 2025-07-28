@@ -126,7 +126,10 @@ export const ThemeProvider = ({ children }) => {
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    return {
+  isMobile: window.innerWidth < 768,
+  theme: 'default'
+};
   }
   return context;
 };

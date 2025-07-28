@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 const HomePage = () => {
   const [currentTrainerIndex, setCurrentTrainerIndex] = useState(0);
@@ -23,207 +23,25 @@ const HomePage = () => {
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [reviewsError, setReviewsError] = useState(null);
 
-  // API Base URL - แก้ไขให้เชื่อมต่อกับ backend จริง
+  // API Base URL
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
-  // Helper function สำหรับ API calls
-  const apiCall = async (endpoint, options = {}) => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-
+  // Helper function สำหรับ API calls - แก้ไข error handling
+  const apiCall = async (endpoint) => {
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers
-        },
-        signal: controller.signal,
-        ...options
-      });
-
-      clearTimeout(timeoutId);
-
+      const response = await fetch(`http://localhost:3001${endpoint}`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-
-      return await response.json();
+      return response.json();
     } catch (error) {
-      clearTimeout(timeoutId);
-      if (error.name === 'AbortError') {
-        throw new Error('Request timeout - เซิร์ฟเวอร์ใช้เวลานานเกินไป');
-      }
-      throw error;
+      console.warn(`API Error for ${endpoint}:`, error.message);
+      return [];
     }
   };
 
-  // API Functions - แก้ไขให้เชื่อมต่อกับฐานข้อมูลจริง
-  const fetchFeaturedTrainers = async () => {
-    setTrainersLoading(true);
-    setTrainersError(null);
-    
-    try {
-      const data = await apiCall('/trainers/featured?limit=8');
-      
-      if (data.success && data.data && Array.isArray(data.data)) {
-        // Map database data to component format
-        const mappedTrainers = data.data.map(trainer => ({
-          id: trainer.id,
-          name: trainer.display_name || 
-                `${trainer.first_name || ''} ${trainer.last_name || ''}`.trim().toUpperCase() || 
-                'เทรนเนอร์',
-          specialty: trainer.specialties || 'ฟิตเนส • ออกกำลังกาย',
-          location: `${trainer.city || ''} ${trainer.province || ''}`.trim() || 'กรุงเทพฯ',
-          experience: trainer.experience_years > 10 ? 'มากกว่า 10 ปี' : 
-                     trainer.experience_years >= 5 ? '5-10 ปี' : 
-                     trainer.experience_years >= 3 ? '3-5 ปี' : 'น้อยกว่า 3 ปี',
-          rating: `${parseFloat(trainer.rating || 4.5).toFixed(1)} ⭐⭐⭐⭐⭐`,
-          reviews: `${trainer.total_reviews || 0} รีวิว`,
-          price: `${parseInt(trainer.hourly_rate || 1000).toLocaleString()} บาท/เซสชั่น`,
-          image: trainer.avatar_url || 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=1000&fit=crop'
-        }));
-        
-        setTrainers(mappedTrainers);
-      } else {
-        console.warn('No trainers found or invalid response format');
-        setDemoTrainers();
-      }
-      
-    } catch (err) {
-      console.error('Error fetching trainers:', err);
-      setTrainersError(err.message);
-      // Use demo data if API fails
-      setDemoTrainers();
-    } finally {
-      setTrainersLoading(false);
-    }
-  };
-
-  const fetchFeaturedArticles = async () => {
-    setArticlesLoading(true);
-    setArticlesError(null);
-    
-    try {
-      const data = await apiCall('/articles/featured?limit=3');
-      
-      if (data.success && data.data && Array.isArray(data.data)) {
-        // Map database data to component format
-        const mappedArticles = data.data.map(article => ({
-          id: article.id,
-          title: article.title,
-          excerpt: article.excerpt || article.content?.substring(0, 150) + '...' || '',
-          date: article.published_at ? 
-                new Date(article.published_at).toLocaleDateString('th-TH', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                }) : 
-                new Date().toLocaleDateString('th-TH'),
-          category: (article.category?.toUpperCase() || 'ARTICLE'),
-          image: article.featured_image_url || 
-                 article.image_url || 
-                 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=400&fit=crop'
-        }));
-        
-        setArticles(mappedArticles);
-      } else {
-        console.warn('No articles found or invalid response format');
-        setDemoArticles();
-      }
-      
-    } catch (err) {
-      console.error('Error fetching articles:', err);
-      setArticlesError(err.message);
-      setDemoArticles();
-    } finally {
-      setArticlesLoading(false);
-    }
-  };
-
-  const fetchFeaturedEvents = async () => {
-    setEventsLoading(true);
-    setEventsError(null);
-    
-    try {
-      const data = await apiCall('/events/featured?limit=2');
-      
-      if (data.success && data.data && Array.isArray(data.data)) {
-        // Map database data to component format
-        const mappedEvents = data.data.map(event => {
-          const eventDate = new Date(event.start_date || event.event_date);
-          return {
-            id: event.id,
-            day: eventDate.getDate().toString().padStart(2, '0'),
-            month: eventDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
-            title: event.title,
-            time: event.start_time || '06:00 AM',
-            location: event.location_name ? 
-                     `${event.location_name}${event.location_address ? ', ' + event.location_address : ''}` :
-                     (event.location || 'สถานที่จัดงาน'),
-            description: event.description || event.excerpt || '',
-            image: event.featured_image_url || 
-                   event.image_url || 
-                   'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800&h=400&fit=crop'
-          };
-        });
-        
-        setEvents(mappedEvents);
-      } else {
-        console.warn('No events found or invalid response format');
-        setDemoEvents();
-      }
-      
-    } catch (err) {
-      console.error('Error fetching events:', err);
-      setEventsError(err.message);
-      setDemoEvents();
-    } finally {
-      setEventsLoading(false);
-    }
-  };
-
-  const fetchFeaturedReviews = async () => {
-    setReviewsLoading(true);
-    setReviewsError(null);
-    
-    try {
-      const data = await apiCall('/reviews/featured?limit=6');
-      
-      if (data.success && data.data && Array.isArray(data.data)) {
-        // Map database data to component format
-        const mappedReviews = data.data.map(review => ({
-          id: review.id,
-          stars: '⭐'.repeat(Math.min(5, Math.max(1, review.rating || 5))),
-          content: review.comment || review.review_text || 'รีวิวที่ยอดเยี่ยม',
-          name: review.customer_name || 
-                (review.customer ? `${review.customer.first_name || ''} ${review.customer.last_name || ''}`.trim() : '') ||
-                'ลูกค้า',
-          program: review.trainer_name ? 
-                  `${review.trainer_name} • ${review.package_name || 'แพคเกจ'}` :
-                  `เทรนเนอร์ • ${review.package_name || 'แพคเกจ'}`,
-          image: review.customer_avatar || 
-                 (review.customer?.avatar_url) ||
-                 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
-        }));
-        
-        setReviews(mappedReviews);
-      } else {
-        console.warn('No reviews found or invalid response format');
-        setDemoReviews();
-      }
-      
-    } catch (err) {
-      console.error('Error fetching reviews:', err);
-      setReviewsError(err.message);
-      setDemoReviews();
-    } finally {
-      setReviewsLoading(false);
-    }
-  };
-
-  // Demo Data Functions (fallback when API fails) - คงไว้เป็น fallback
-  const setDemoTrainers = () => {
+  // Demo Data Functions - แก้ไขให้เป็น useCallback
+  const setDemoTrainers = useCallback(() => {
     const demoTrainers = [
       { 
         id: 1, 
@@ -315,9 +133,9 @@ const HomePage = () => {
       }
     ];
     setTrainers(demoTrainers);
-  };
+  }, []);
 
-  const setDemoArticles = () => {
+  const setDemoArticles = useCallback(() => {
     const demoArticles = [
       { 
         id: 1, 
@@ -345,9 +163,9 @@ const HomePage = () => {
       }
     ];
     setArticles(demoArticles);
-  };
+  }, []);
 
-  const setDemoEvents = () => {
+  const setDemoEvents = useCallback(() => {
     const demoEvents = [
       { 
         id: 1, 
@@ -371,9 +189,9 @@ const HomePage = () => {
       }
     ];
     setEvents(demoEvents);
-  };
+  }, []);
 
-  const setDemoReviews = () => {
+  const setDemoReviews = useCallback(() => {
     const demoReviews = [
       { 
         id: 1, 
@@ -425,12 +243,170 @@ const HomePage = () => {
       }
     ];
     setReviews(demoReviews);
-  };
+  }, []);
 
-  // Fetch all data on component mount - เรียกใช้ API เมื่อ component โหลด
+  // API Functions - ทำให้เป็น useCallback พร้อม error handling
+  const fetchFeaturedTrainers = useCallback(async () => {
+    setTrainersLoading(true);
+    setTrainersError(null);
+    
+    try {
+      const data = await apiCall('/trainers/featured?limit=8');
+      
+      if (data && data.success && data.data && Array.isArray(data.data)) {
+        const mappedTrainers = data.data.map(trainer => ({
+          id: trainer.id,
+          name: trainer.display_name || 
+                `${trainer.first_name || ''} ${trainer.last_name || ''}`.trim().toUpperCase() || 
+                'เทรนเนอร์',
+          specialty: trainer.specialties || 'ฟิตเนส • ออกกำลังกาย',
+          location: `${trainer.city || ''} ${trainer.province || ''}`.trim() || 'กรุงเทพฯ',
+          experience: trainer.experience_years > 10 ? 'มากกว่า 10 ปี' : 
+                     trainer.experience_years >= 5 ? '5-10 ปี' : 
+                     trainer.experience_years >= 3 ? '3-5 ปี' : 'น้อยกว่า 3 ปี',
+          rating: `${parseFloat(trainer.rating || 4.5).toFixed(1)} ⭐⭐⭐⭐⭐`,
+          reviews: `${trainer.total_reviews || 0} รีวิว`,
+          price: `${parseInt(trainer.hourly_rate || 1000).toLocaleString()} บาท/เซสชั่น`,
+          image: trainer.avatar_url || 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=1000&fit=crop'
+        }));
+        
+        setTrainers(mappedTrainers);
+      } else {
+        console.warn('No trainers found, using demo data');
+        setDemoTrainers();
+      }
+      
+    } catch (err) {
+      console.error('Error fetching trainers:', err);
+      setTrainersError(err.message);
+      setDemoTrainers();
+    } finally {
+      setTrainersLoading(false);
+    }
+  }, [setDemoTrainers]);
+
+  const fetchFeaturedArticles = useCallback(async () => {
+    setArticlesLoading(true);
+    setArticlesError(null);
+    
+    try {
+      const data = await apiCall('/articles/featured?limit=3');
+      
+      if (data && data.success && data.data && Array.isArray(data.data)) {
+        const mappedArticles = data.data.map(article => ({
+          id: article.id,
+          title: article.title,
+          excerpt: article.excerpt || article.content?.substring(0, 150) + '...' || '',
+          date: article.published_at ? 
+                new Date(article.published_at).toLocaleDateString('th-TH', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                }) : 
+                new Date().toLocaleDateString('th-TH'),
+          category: (article.category?.toUpperCase() || 'ARTICLE'),
+          image: article.featured_image_url || 
+                 article.image_url || 
+                 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&h=400&fit=crop'
+        }));
+        
+        setArticles(mappedArticles);
+      } else {
+        console.warn('No articles found, using demo data');
+        setDemoArticles();
+      }
+      
+    } catch (err) {
+      console.error('Error fetching articles:', err);
+      setArticlesError(err.message);
+      setDemoArticles();
+    } finally {
+      setArticlesLoading(false);
+    }
+  }, [setDemoArticles]);
+
+  const fetchFeaturedEvents = useCallback(async () => {
+    setEventsLoading(true);
+    setEventsError(null);
+    
+    try {
+      const data = await apiCall('/events/featured?limit=2');
+      
+      if (data && data.success && data.data && Array.isArray(data.data)) {
+        const mappedEvents = data.data.map(event => {
+          const eventDate = new Date(event.start_date || event.event_date);
+          return {
+            id: event.id,
+            day: eventDate.getDate().toString().padStart(2, '0'),
+            month: eventDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase(),
+            title: event.title,
+            time: event.start_time || '06:00 AM',
+            location: event.location_name ? 
+                     `${event.location_name}${event.location_address ? ', ' + event.location_address : ''}` :
+                     (event.location || 'สถานที่จัดงาน'),
+            description: event.description || event.excerpt || '',
+            image: event.featured_image_url || 
+                   event.image_url || 
+                   'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800&h=400&fit=crop'
+          };
+        });
+        
+        setEvents(mappedEvents);
+      } else {
+        console.warn('No events found, using demo data');
+        setDemoEvents();
+      }
+      
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      setEventsError(err.message);
+      setDemoEvents();
+    } finally {
+      setEventsLoading(false);
+    }
+  }, [setDemoEvents]);
+
+  const fetchFeaturedReviews = useCallback(async () => {
+    setReviewsLoading(true);
+    setReviewsError(null);
+    
+    try {
+      const data = await apiCall('/reviews/featured?limit=6');
+      
+      if (data && data.success && data.data && Array.isArray(data.data)) {
+        const mappedReviews = data.data.map(review => ({
+          id: review.id,
+          stars: '⭐'.repeat(Math.min(5, Math.max(1, review.rating || 5))),
+          content: review.comment || review.review_text || 'รีวิวที่ยอดเยี่ยม',
+          name: review.customer_name || 
+                (review.customer ? `${review.customer.first_name || ''} ${review.customer.last_name || ''}`.trim() : '') ||
+                'ลูกค้า',
+          program: review.trainer_name ? 
+                  `${review.trainer_name} • ${review.package_name || 'แพคเกจ'}` :
+                  `เทรนเนอร์ • ${review.package_name || 'แพคเกจ'}`,
+          image: review.customer_avatar || 
+                 (review.customer?.avatar_url) ||
+                 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'
+        }));
+        
+        setReviews(mappedReviews);
+      } else {
+        console.warn('No reviews found, using demo data');
+        setDemoReviews();
+      }
+      
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+      setReviewsError(err.message);
+      setDemoReviews();
+    } finally {
+      setReviewsLoading(false);
+    }
+  }, [setDemoReviews]);
+
+  // Fetch all data on component mount
   useEffect(() => {
     const fetchAllData = async () => {
-      // เรียกใช้ API ทั้งหมดพร้อมกัน
       await Promise.allSettled([
         fetchFeaturedTrainers(),
         fetchFeaturedArticles(),
@@ -440,28 +416,28 @@ const HomePage = () => {
     };
 
     fetchAllData();
-  }, []);
+  }, [fetchFeaturedTrainers, fetchFeaturedArticles, fetchFeaturedEvents, fetchFeaturedReviews]);
 
   // Get items per view based on screen size
-  const getItemsPerView = () => {
+  const getItemsPerView = useCallback(() => {
     if (typeof window !== 'undefined') {
       if (window.innerWidth <= 576) return 1;
       if (window.innerWidth <= 991) return 2;
       return 4;
     }
     return 4;
-  };
+  }, []);
 
-  const getReviewItemsPerView = () => {
+  const getReviewItemsPerView = useCallback(() => {
     if (typeof window !== 'undefined') {
       if (window.innerWidth <= 576) return 1;
       if (window.innerWidth <= 991) return 2;
       return 3;
     }
     return 3;
-  };
+  }, []);
 
-  // Auto-play functionality - แก้ไข dependency ให้ใช้ loading state
+  // Auto-play functionality
   useEffect(() => {
     if (trainers.length > 0 && !trainersLoading) {
       const trainersInterval = setInterval(() => {
@@ -472,7 +448,7 @@ const HomePage = () => {
 
       return () => clearInterval(trainersInterval);
     }
-  }, [trainers.length, trainersLoading]);
+  }, [trainers.length, trainersLoading, getItemsPerView]);
 
   useEffect(() => {
     if (reviews.length > 0 && !reviewsLoading) {
@@ -484,7 +460,7 @@ const HomePage = () => {
 
       return () => clearInterval(reviewsInterval);
     }
-  }, [reviews.length, reviewsLoading]);
+  }, [reviews.length, reviewsLoading, getReviewItemsPerView]);
 
   // Generate particles
   const generateParticles = () => {
@@ -516,7 +492,6 @@ const HomePage = () => {
     if (specialty) searchParams.append('specialty', specialty);
     if (price) searchParams.append('price', price);
     
-    // เปลี่ยนจาก alert เป็น navigation
     window.location.href = `/trainers?${searchParams.toString()}`;
   };
 
@@ -539,18 +514,18 @@ const HomePage = () => {
         <div className="trainer-card">
           <div className="trainer-image" style={{ backgroundImage: `url(${trainer.image})` }}>
             <div className="trainer-social">
-              <a href="#" className="social-link">
+              <button type="button" className="social-link" onClick={(e) => e.preventDefault()}>
                 <i className="fab fa-facebook-f"></i>
-              </a>
-              <a href="#" className="social-link">
+              </button>
+              <button type="button" className="social-link" onClick={(e) => e.preventDefault()}>
                 <i className="fab fa-instagram"></i>
-              </a>
-              <a href="#" className="social-link">
+              </button>
+              <button type="button" className="social-link" onClick={(e) => e.preventDefault()}>
                 <i className="fab fa-twitter"></i>
-              </a>
-              <a href="#" className="social-link">
+              </button>
+              <button type="button" className="social-link" onClick={(e) => e.preventDefault()}>
                 <i className="fab fa-youtube"></i>
-              </a>
+              </button>
             </div>
 
             <div className="trainer-info">
@@ -567,7 +542,7 @@ const HomePage = () => {
             
             <button 
               className="btn-view-profile"
-              onClick={() => window.location.href = `/trainerdetail/${trainer.id}`}
+              onClick={() => window.location.href = `/trainer/${trainer.id}`}
             >
               ดูโปรไฟล์
             </button>
@@ -580,7 +555,7 @@ const HomePage = () => {
 
   return (
     <div className="fitconnect-homepage">
-      {/* CSS Styles - ไม่เปลี่ยนแปลง */}
+      {/* CSS Styles */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap');
         @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
@@ -607,6 +582,30 @@ const HomePage = () => {
           color: var(--text-dark);
           overflow-x: hidden;
           background: var(--white);
+        }
+
+        /* Social Link Button Styles */
+        .social-link {
+          width: 40px;
+          height: 40px;
+          background: rgba(255,255,255,0.1);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255,255,255,0.2);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          cursor: pointer;
+        }
+
+        .social-link:hover {
+          background: var(--secondary-color);
+          transform: scale(1.1);
+          color: white;
+          border-color: var(--secondary-color);
         }
 
         /* Particles Background */
@@ -746,6 +745,8 @@ const HomePage = () => {
         }
 
         .btn-hero:hover {
+          background: #fff;
+          color: var(--secondary-color);
           transform: translateY(-3px);
           box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
@@ -887,28 +888,6 @@ const HomePage = () => {
 
         .trainer-card:hover .trainer-social {
           opacity: 1;
-        }
-
-        .social-link {
-          width: 40px;
-          height: 40px;
-          background: rgba(255,255,255,0.1);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255,255,255,0.2);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          text-decoration: none;
-          transition: all 0.3s ease;
-        }
-
-        .social-link:hover {
-          background: var(--secondary-color);
-          transform: scale(1.1);
-          color: white;
-          border-color: var(--secondary-color);
         }
 
         .trainer-info {
@@ -1392,7 +1371,7 @@ const HomePage = () => {
           margin: 0 1rem;
         }
 
-        /* Loading States - เพิ่ม CSS สำหรับ loading */
+        /* Loading States */
         .loading-spinner {
           display: inline-block;
           width: 20px;
@@ -1503,7 +1482,7 @@ const HomePage = () => {
               </p>
               <div className="hero-buttons">
                 <button className="btn btn-hero btn-hero-primary" onClick={() => window.location.href = "/search"}>ค้นหาเทรนเนอร์</button>
-                <button className="btn btn-hero btn-hero-outline" onClick={() => window.location.href = "/signup-trainer"}>สมัครเป็นเทรนเนอร์</button>
+                <button className="btn btn-hero btn-hero-outline" onClick={() => window.location.href = "/signup"}>สมัครเป็นเทรนเนอร์</button>
               </div>
             </div>
           </div>
@@ -1555,7 +1534,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Featured Trainers Section - เพิ่ม loading states */}
+      {/* Featured Trainers Section */}
       <section className="py-5 trainers-section" id="trainers" style={{ backgroundColor: '#0a0a0a' }}>
         <div className="container">
           <div className="section-header">
@@ -1609,7 +1588,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Events Section - เพิ่ม loading states */}
+      {/* Events Section */}
       <section className="events-section" id="events">
         <div className="container">
           <div className="section-header">
@@ -1655,7 +1634,7 @@ const HomePage = () => {
                       <p>{event.description}</p>
                       <button 
                         className="btn btn-primary-custom"
-                        onClick={() => window.location.href = `/events/${event.id}`}
+                        onClick={() => window.location.href = `/event/${event.id}`}
                       >
                         ดูรายละเอียด
                       </button>
@@ -1672,7 +1651,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Articles Section - เพิ่ม loading states */}
+      {/* Articles Section */}
       <section className="py-5 bg-light" id="articles">
         <div className="container">
           <div className="section-header">
@@ -1710,7 +1689,7 @@ const HomePage = () => {
                       <div className="article-meta">
                         <span><i className="fas fa-calendar me-1"></i>{article.date}</span>
                         <a 
-                          href={`/articles/${article.id}`} 
+                          href={`/article/${article.id}`} 
                           className="text-decoration-none" 
                           style={{ color: 'var(--secondary-color)' }}
                         >
@@ -1730,7 +1709,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Reviews Section - เพิ่ม loading states */}
+      {/* Reviews Section */}
       <section className="review-section">
         <div className="container">
           <div className="section-header">
@@ -1798,12 +1777,11 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Partners Section - ไม่เปลี่ยนแปลง */}
+      {/* Partners Section */}
       <section className="partners-section">
         <div className="container">
           <div className="partners-slider">
             <div className="partners-track">
-              {/* First set */}
               <div className="partner-item">
                 <div className="partner-logo">
                   <i className="fas fa-dumbbell me-2"></i>Fitness First
@@ -1834,7 +1812,6 @@ const HomePage = () => {
                   <i className="fas fa-swimmer me-2"></i>Aqua Fitness
                 </div>
               </div>
-              {/* Duplicate for infinite scroll */}
               <div className="partner-item">
                 <div className="partner-logo">
                   <i className="fas fa-dumbbell me-2"></i>Fitness First
@@ -1875,7 +1852,7 @@ const HomePage = () => {
         <div className="cta-content">
           <h2 className="cta-title">สมัครเป็นเทรนเนอร์กับเรา</h2>
           <p className="cta-subtitle">เข้าร่วมกับเครือข่ายเทรนเนอร์มืออาชีพ และเข้าถึงลูกค้าได้มากขึ้น</p>
-          <button className="btn btn-cta" onClick={() => window.location.href = "/signup-trainer"}>สมัครเป็นเทรนเนอร์</button>
+          <button className="btn btn-cta" onClick={() => window.location.href = "/signup"}>สมัครเป็นเทรนเนอร์</button>
         </div>
       </section>
     </div>

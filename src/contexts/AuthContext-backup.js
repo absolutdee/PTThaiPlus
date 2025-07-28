@@ -1,5 +1,6 @@
 // src/contexts/AuthContext.js
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { authService } from '../services/auth';
 
 const AuthContext = createContext();
 
@@ -70,71 +71,44 @@ const authReducer = (state, action) => {
 // Initial State
 const initialState = {
   user: null,
-  token: null, // ไม่ใช้ localStorage ตอนเริ่มต้น
+  token: localStorage.getItem('authToken'),
   isAuthenticated: false,
-  isLoading: false, // เปลี่ยนเป็น false เพื่อไม่ให้ loading
+  isLoading: true,
   error: null
-};
-
-// Mock auth service สำหรับการทดสอบ
-const mockAuthService = {
-  validateToken: async (token) => {
-    // สำหรับการทดสอบ ให้ return error
-    throw new Error('API service not available');
-  },
-  login: async (credentials) => {
-    // Mock login
-    return {
-      user: { id: 1, name: 'Test User', email: credentials.email },
-      token: 'mock-token-123'
-    };
-  },
-  logout: async () => {
-    // Mock logout
-    return Promise.resolve();
-  }
 };
 
 // Auth Provider
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  // Check authentication status on mount (แต่ไม่ทำให้ app crash)
+  // Check authentication status on mount
   useEffect(() => {
     checkAuthStatus();
   }, []);
 
   const checkAuthStatus = async () => {
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-        return;
-      }
-
-      // ลองตรวจสอบ token แต่ไม่ให้ crash app
-      try {
-        const user = await mockAuthService.validateToken(token);
-        dispatch({
-          type: AUTH_ACTIONS.LOGIN_SUCCESS,
-          payload: { user, token }
-        });
-      } catch (error) {
-        // ลบ token ที่ไม่ valid และไม่แสดง error
-        localStorage.removeItem('authToken');
-        dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
-        console.warn('Auth token validation failed:', error.message);
-      }
-    } catch (error) {
-      console.warn('Auth check failed:', error.message);
+    const token = localStorage.getItem('authToken');
+    if (!token) {
       dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false });
+      return;
+    }
+
+    try {
+      const user = await authService.validateToken(token);
+      dispatch({
+        type: AUTH_ACTIONS.LOGIN_SUCCESS,
+        payload: { user, token }
+      });
+    } catch (error) {
+      localStorage.removeItem('authToken');
+      dispatch({ type: AUTH_ACTIONS.LOGIN_FAILURE, payload: error.message });
     }
   };
 
   const login = async (credentials) => {
     dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true });
     try {
-      const response = await mockAuthService.login(credentials);
+      const response = await authService.login(credentials);
       localStorage.setItem('authToken', response.token);
       dispatch({
         type: AUTH_ACTIONS.LOGIN_SUCCESS,
@@ -149,9 +123,9 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await mockAuthService.logout();
+      await authService.logout();
     } catch (error) {
-      console.warn('Logout error:', error);
+      console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('authToken');
       dispatch({ type: AUTH_ACTIONS.LOGOUT });

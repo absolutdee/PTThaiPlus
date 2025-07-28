@@ -4,6 +4,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 // Bootstrap CSS (แก้ไขปัญหา CSS)
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+// เพิ่มบรรทัดนี้เพื่อ import AuthProvider
+import { AuthProvider } from './contexts/AuthContext';
+
 // Custom CSS (ป้องกัน crash ถ้าไฟล์ไม่มี)
 try {
   require('./styles/main.css');
@@ -184,6 +187,13 @@ const EventsPage = lazy(() =>
   }))
 );
 
+const EventDetailPage = lazy(() => 
+  import('./components/main/EventDetailPage').catch(() => ({
+    default: () => <div className="container mt-5"><h2>👨‍💼 Event Detail (Coming Soon)</h2></div>
+  }))
+);
+
+
 const GymsPage = lazy(() => 
   import('./components/main/GymsPage').catch(() => ({
     default: () => <div className="container mt-5"><h2>🏋️ Gyms (Coming Soon)</h2></div>
@@ -193,6 +203,12 @@ const GymsPage = lazy(() =>
 const ArticlesPage = lazy(() => 
   import('./components/main/ArticlesPage').catch(() => ({
     default: () => <div className="container mt-5"><h2>📝 Articles (Coming Soon)</h2></div>
+  }))
+);
+
+const ArticleDetailPage = lazy(() => 
+  import('./components/main/ArticleDetailPage').catch(() => ({
+    default: () => <div className="container mt-5"><h2>👨‍💼 Article Detail (Coming Soon)</h2></div>
   }))
 );
 
@@ -216,13 +232,54 @@ const SignUpPage = lazy(() =>
 
 const ForgotPasswordPage = lazy(() => 
   import('./components/main/ForgotPasswordPage').catch(() => ({
-    default: () => <div className="container mt-5"><h2>📝 Sign Up (Coming Soon)</h2></div>
+    default: () => <div className="container mt-5"><h2>📝 Forgot Password (Coming Soon)</h2></div>
   }))
 );
+
+const SignUpTrainer = lazy(() => 
+  import('./components/main/TrainerSignUpPage.js').catch(() => ({
+    default: () => <div className="container mt-5"><h2>📝 Forgot Password (Coming Soon)</h2></div>
+  }))
+);
+
+
+// Admin Components
+const AdminMainPage = lazy(() => 
+  import('./components/admin/AdminLayout').catch(() => ({
+    default: FallbackHome
+  }))
+);
+
+const MainClientDashboard = lazy(() => 
+  import('./components/client/MainClientDashboard').catch(() => ({
+    default: FallbackHome
+  }))
+);
+
+const TrainerMainDashboard = lazy(() => 
+  import('./components/trainer/TrainerMainDashboard').catch(() => ({
+    default: FallbackHome
+  }))
+);
+/*
+const DashboardOverview = lazy(() => 
+  import('./components/admin/DashboardOverview').catch(() => ({
+    default: FallbackHome
+  }))
+);
+
+const AdminChatPage = lazy(() => 
+  import('./components/admin/AdminChatPage').catch(() => ({
+    default: FallbackHome
+  }))
+);*/
+
+
 
 function App() {
   return (
     <ErrorBoundary>
+      <AuthProvider>
       <Router basename={process.env.NODE_ENV === 'production' ? '/PTThaiPlus' : ''}>
         <div className="App">
           <Suspense fallback={<LoadingSpinner />}>
@@ -233,20 +290,27 @@ function App() {
                 <Route path="search" element={<TrainerSearchPage />} />
                 <Route path="trainer/:id" element={<TrainerDetailPage />} />
                 <Route path="events" element={<EventsPage />} />
+                <Route path="event/:id" element={<EventDetailPage />} />
                 <Route path="gyms" element={<GymsPage />} />
                 <Route path="articles" element={<ArticlesPage />} />
+                <Route path="article/:id" element={<ArticleDetailPage />} />
                 <Route path="contact" element={<ContactPage />} />
                 <Route path="signin" element={<SignInPage />} />
                 <Route path="signup" element={<SignUpPage />} />
                 <Route path="forgotpassword" element={<ForgotPasswordPage />} />
+                <Route path="signup-trainer" element={<SignUpTrainer />} />
               </Route>
-              
+
+              <Route path="/admin" element={<AdminMainPage />}></Route>
+              <Route path="/client" element={<MainClientDashboard />}></Route>
+              <Route path="/trainer" element={<TrainerMainDashboard />}></Route>
               {/* Fallback Route */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         </div>
       </Router>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

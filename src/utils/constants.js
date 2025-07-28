@@ -143,7 +143,7 @@ export const SUCCESS_MESSAGES = {
   PAYMENT_SUCCESS: 'ชำระเงินสำเร็จ',
 };
 
-export default {
+const constants = {
   API_ENDPOINTS,
   APP_CONFIG,
   COLORS,
@@ -156,3 +156,5 @@ export default {
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
 };
+
+export default constants;
