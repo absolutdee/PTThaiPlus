@@ -566,7 +566,7 @@ const MainWebsite = () => {
       </Offcanvas>
 
       {/* Main Content */}
-      <main className="main-content" style={{ paddingTop: '80px' }}>
+      <main className="main-content" style={{ paddingTop: '76px' }}>
         <Outlet />
       </main>
 

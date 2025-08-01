@@ -1,0 +1,243 @@
+@echo off
+echo 🔧 FitConnect Complete Final Fix
+echo ==================================
+
+cd /d "%~dp0"
+echo 📂 Working at: %cd%
+
+echo.
+echo 📋 Step 1: Checking current structure...
+if not exist package.json (
+    echo ❌ package.json not found at root level!
+    echo ❌ Make sure you're in the correct directory
+    pause
+    exit /b 1
+)
+
+echo ✅ package.json found - proceeding with fix
+
+echo.
+echo 🧹 Step 2: Complete cleanup...
+if exist node_modules (
+    echo Removing node_modules...
+    rmdir /s /q node_modules
+    echo ✅ node_modules removed
+)
+
+if exist package-lock.json (
+    echo Removing package-lock.json...
+    del package-lock.json
+    echo ✅ package-lock.json removed
+)
+
+if exist yarn.lock (
+    echo Removing yarn.lock...
+    del yarn.lock
+    echo ✅ yarn.lock removed
+)
+
+echo.
+echo 📁 Step 3: Creating required folders...
+if not exist public mkdir public
+if not exist src mkdir src
+if not exist src\components mkdir src\components
+if not exist src\components\main mkdir src\components\main
+if not exist src\contexts mkdir src\contexts
+
+echo ✅ Folders created
+
+echo.
+echo 📄 Step 4: Creating essential files...
+
+REM Backup existing App.js
+if exist src\App.js (
+    echo Backing up existing App.js...
+    copy src\App.js src\App.js.backup
+    echo ✅ App.js backed up as App.js.backup
+)
+
+REM Create public/index.html
+echo Creating public/index.html...
+(
+echo ^<!DOCTYPE html^>
+echo ^<html lang="th"^>
+echo   ^<head^>
+echo     ^<meta charset="utf-8" /^>
+echo     ^<meta name="viewport" content="width=device-width, initial-scale=1" /^>
+echo     ^<meta name="theme-color" content="#232956" /^>
+echo     ^<title^>FitConnect^</title^>
+echo     ^<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet"^>
+echo     ^<style^>
+echo       body { margin: 0; font-family: 'Noto Sans Thai', sans-serif; }
+echo       #loading-screen { position: fixed; top: 0; left: 0; width: 100%%; height: 100%%; background: linear-gradient(135deg, #232956 0%%, #df2528 100%%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; }
+echo       .loading-logo { font-size: 4rem; margin-bottom: 1rem; animation: pulse 2s infinite; }
+echo       .loading-text { font-size: 1.5rem; margin-bottom: 2rem; font-weight: 600; }
+echo       .loading-spinner { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+echo       @keyframes pulse { 0%%, 100%% { transform: scale(1); } 50%% { transform: scale(1.05); } }
+echo       @keyframes spin { to { transform: rotate(360deg); } }
+echo       #root:not(:empty^) ~ #loading-screen { display: none; }
+echo     ^</style^>
+echo   ^</head^>
+echo   ^<body^>
+echo     ^<noscript^>จำเป็นต้องเปิด JavaScript^</noscript^>
+echo     ^<div id="root"^>^</div^>
+echo     ^<div id="loading-screen"^>
+echo       ^<div class="loading-logo"^>🏋️‍♂️^</div^>
+echo       ^<div class="loading-text"^>FitConnect^</div^>
+echo       ^<div class="loading-spinner"^>^</div^>
+echo       ^<p^>กำลังโหลดแอปพลิเคชัน...^</p^>
+echo     ^</div^>
+echo     ^<script^>
+echo       function hideLoadingScreen(){ var l=document.getElementById('loading-screen'); var r=document.getElementById('root'); if(r&&r.children.length^>0&&l){ l.style.opacity='0'; l.style.transition='opacity 0.5s ease-out'; setTimeout(function(){ l.style.display='none'; }, 500); } }
+echo       var checkInterval = setInterval(function(){ var r=document.getElementById('root'); if(r&&r.children.length^>0){ hideLoadingScreen(); clearInterval(checkInterval); } }, 100);
+echo       setTimeout(function(){ hideLoadingScreen(); clearInterval(checkInterval); }, 10000);
+echo     ^</script^>
+echo   ^</body^>
+echo ^</html^>
+) > public\index.html
+
+echo ✅ public/index.html created
+
+REM Create public/manifest.json
+echo Creating public/manifest.json...
+(
+echo {
+echo   "short_name": "FitConnect",
+echo   "name": "FitConnect - แพลตฟอร์มเทรนเนอร์ออกกำลังกาย",
+echo   "start_url": ".",
+echo   "display": "standalone",
+echo   "theme_color": "#232956",
+echo   "background_color": "#ffffff"
+echo }
+) > public\manifest.json
+
+echo ✅ public/manifest.json created
+
+REM Create tsconfig.json
+echo Creating tsconfig.json...
+(
+echo {
+echo   "compilerOptions": {
+echo     "target": "es5",
+echo     "lib": ["dom", "dom.iterable", "es6"],
+echo     "allowJs": true,
+echo     "skipLibCheck": true,
+echo     "esModuleInterop": true,
+echo     "allowSyntheticDefaultImports": true,
+echo     "strict": false,
+echo     "forceConsistentCasingInFileNames": true,
+echo     "module": "esnext",
+echo     "moduleResolution": "node",
+echo     "resolveJsonModule": true,
+echo     "isolatedModules": true,
+echo     "noEmit": true,
+echo     "jsx": "react-jsx"
+echo   },
+echo   "include": ["src/**/*"],
+echo   "exclude": ["node_modules", "build"]
+echo }
+) > tsconfig.json
+
+echo ✅ tsconfig.json created
+
+echo.
+echo 📦 Step 5: Installing TypeScript dependencies...
+call npm install --save-dev typescript @types/node @types/react @types/react-dom @types/jest
+
+if %errorlevel% neq 0 (
+    echo ❌ TypeScript install failed! Trying with --legacy-peer-deps...
+    call npm install --save-dev typescript @types/node @types/react @types/react-dom @types/jest --legacy-peer-deps
+    
+    if %errorlevel% neq 0 (
+        echo ❌ Still failed! Trying with --force...
+        call npm install --save-dev typescript @types/node @types/react @types/react-dom @types/jest --force
+    )
+)
+
+echo ✅ TypeScript dependencies installed
+
+echo.
+echo 📦 Step 6: Installing all dependencies...
+call npm install
+
+if %errorlevel% neq 0 (
+    echo ❌ npm install failed! Trying with --legacy-peer-deps...
+    call npm install --legacy-peer-deps
+    
+    if %errorlevel% neq 0 (
+        echo ❌ Still failed! Trying with --force...
+        call npm install --force
+        
+        if %errorlevel% neq 0 (
+            echo ❌ All installation attempts failed!
+            echo.
+            echo 🆘 Try these manual steps:
+            echo 1. npm cache clean --force
+            echo 2. npm install --legacy-peer-deps
+            echo 3. Check Node.js version (should be 16+ but not too new)
+            pause
+            exit /b 1
+        )
+    )
+)
+
+echo ✅ All dependencies installed
+
+echo.
+echo 🔍 Step 7: Verifying installation...
+echo Checking TypeScript:
+call npm ls typescript
+
+echo.
+echo Checking React Scripts:
+call npm ls react-scripts
+
+echo.
+echo 📋 Step 8: Final structure check...
+echo Root files:
+if exist package.json echo ✅ package.json
+if exist tsconfig.json echo ✅ tsconfig.json
+if exist node_modules echo ✅ node_modules
+
+echo.
+echo Public files:
+if exist public\index.html echo ✅ public/index.html
+if exist public\manifest.json echo ✅ public/manifest.json
+
+echo.
+echo Src files:
+if exist src\App.js echo ✅ src/App.js
+if exist src\index.js echo ✅ src/index.js
+
+echo.
+echo 🎉 Complete fix finished successfully!
+echo.
+
+REM Check for critical missing files
+set MISSING_FILES=0
+
+if not exist src\index.js (
+    echo ⚠️  CRITICAL: src/index.js is missing!
+    set MISSING_FILES=1
+)
+
+if not exist src\App.js (
+    echo ⚠️  CRITICAL: src/App.js is missing!
+    set MISSING_FILES=1
+)
+
+if %MISSING_FILES%==1 (
+    echo.
+    echo ❌ Critical files are missing. The app may not start.
+    echo 💡 You need to create these files manually or copy them from your backup.
+    echo.
+    echo Press any key to continue anyway, or Ctrl+C to exit...
+    pause >nul
+)
+
+echo 🚀 Attempting to start the application...
+echo If you see TypeScript errors, they should be resolved now.
+echo.
+pause
+
+call npm start

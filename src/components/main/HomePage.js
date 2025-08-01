@@ -762,7 +762,7 @@ const HomePage = () => {
           border-radius: 0;
           padding: 3rem;
           box-shadow: var(--shadow);
-          border-left: 5px solid var(--secondary-color);
+          border-radius: 10px;
         }
 
         .search-form {
@@ -770,6 +770,7 @@ const HomePage = () => {
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 1.5rem;
           align-items: end;
+          text-align: left;
         }
 
         .form-group label {
@@ -808,6 +809,7 @@ const HomePage = () => {
           color: var(--primary-color);
           position: relative;
           display: inline-block;
+          margin-bottom: 2rem;
         }
 
         .section-title::after {
@@ -1492,8 +1494,8 @@ const HomePage = () => {
       {/* Search Section */}
       <section className="search-section" id="search">
         <div className="container">
-          <div className="search-container">
-            <h2 className="section-title">ค้นหาเทรนเนอร์ที่เหมาะกับคุณ</h2>
+          <div className="search-container section-header">
+            <h3 className="section-title">ค้นหาเทรนเนอร์ที่เหมาะกับคุณ</h3>
             <div className="search-form">
               <div className="form-group">
                 <label htmlFor="location">สถานที่</label>
@@ -1538,7 +1540,7 @@ const HomePage = () => {
       <section className="py-5 trainers-section" id="trainers" style={{ backgroundColor: '#0a0a0a' }}>
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title" style={{ color: 'white' }}>เทรนเนอร์แนะนำ</h2>
+            <h3 className="section-title" style={{ color: 'white' }}>เทรนเนอร์แนะนำ</h3>
             <p className="section-subtitle" style={{ color: 'rgba(255,255,255,0.7)' }}>พบกับเทรนเนอร์คุณภาพที่ผ่านการคัดเลือก</p>
           </div>
           
@@ -1592,7 +1594,7 @@ const HomePage = () => {
       <section className="events-section" id="events">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">อีเว้นท์</h2>
+            <h3 className="section-title">อีเว้นท์</h3>
             <p className="section-subtitle">กิจกรรมและการแข่งขันที่น่าสนใจ</p>
           </div>
           
@@ -1655,7 +1657,7 @@ const HomePage = () => {
       <section className="py-5 bg-light" id="articles">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">ข่าวสารและบทความ</h2>
+            <h3 className="section-title">ข่าวสารและบทความ</h3>
             <p className="section-subtitle">อัพเดทข้อมูลด้านสุขภาพและการออกกำลังกาย</p>
           </div>
           
@@ -1713,7 +1715,7 @@ const HomePage = () => {
       <section className="review-section">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">รีวิวจากลูกค้า</h2>
+            <h3 className="section-title">รีวิวจากลูกค้า</h3>
             <p className="section-subtitle">เสียงจากผู้ใช้งานจริง</p>
           </div>
           
@@ -1850,7 +1852,7 @@ const HomePage = () => {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="cta-content">
-          <h2 className="cta-title">สมัครเป็นเทรนเนอร์กับเรา</h2>
+          <h3 className="cta-title">สมัครเป็นเทรนเนอร์กับเรา</h3>
           <p className="cta-subtitle">เข้าร่วมกับเครือข่ายเทรนเนอร์มืออาชีพ และเข้าถึงลูกค้าได้มากขึ้น</p>
           <button className="btn btn-cta" onClick={() => window.location.href = "/signup"}>สมัครเป็นเทรนเนอร์</button>
         </div>

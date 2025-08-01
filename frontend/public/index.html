@@ -20,7 +20,7 @@
         -moz-osx-font-smoothing: grayscale;
       }
       
-      #loading-screen {
+      #loading {
         position: fixed;
         top: 0;
         left: 0;
@@ -65,27 +65,11 @@
       @keyframes spin {
         to { transform: rotate(360deg); }
       }
-
-      /* Hide loading screen when React loads */
-      #root:not(:empty) ~ #loading-screen {
-        display: none;
-      }
     </style>
   </head>
   <body>
     <noscript>
-      <div style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 20px;
-        font-family: 'Noto Sans Thai', sans-serif;
-        background: linear-gradient(135deg, #232956 0%, #df2528 100%);
-        color: white;
-        text-align: center;
-      ">
+      <div style="text-align: center; padding: 2rem; font-family: 'Noto Sans Thai', sans-serif;">
         <h2>จำเป็นต้องเปิด JavaScript</h2>
         <p>เว็บไซต์ FitConnect ต้องการ JavaScript เพื่อทำงาน กรุณาเปิด JavaScript ในเบราว์เซอร์ของคุณ</p>
       </div>
@@ -93,7 +77,7 @@
     
     <div id="root"></div>
     
-    <div id="loading-screen">
+    <div id="loading">
       <div class="loading-logo">🏋️‍♂️</div>
       <div class="loading-text">FitConnect</div>
       <div class="loading-spinner"></div>
@@ -101,32 +85,32 @@
     </div>
     
     <script>
-      // Auto-hide loading screen when React loads
-      function hideLoadingScreen() {
-        const loadingScreen = document.getElementById('loading-screen');
+      // ซ่อน loading screen เมื่อ React โหลดเสร็จ
+      function hideLoading() {
+        const loading = document.getElementById('loading');
         const root = document.getElementById('root');
         
-        if (root && root.children.length > 0 && loadingScreen) {
-          loadingScreen.style.opacity = '0';
-          loadingScreen.style.transition = 'opacity 0.5s ease-out';
+        if (root && root.children.length > 0 && loading) {
+          loading.style.opacity = '0';
+          loading.style.transition = 'opacity 0.5s ease-out';
           setTimeout(() => {
-            loadingScreen.style.display = 'none';
+            loading.style.display = 'none';
           }, 500);
         }
       }
       
-      // Check every 100ms
+      // ตรวจสอบทุก 100ms
       const checkInterval = setInterval(() => {
         const root = document.getElementById('root');
         if (root && root.children.length > 0) {
-          hideLoadingScreen();
+          hideLoading();
           clearInterval(checkInterval);
         }
       }, 100);
       
-      // Fallback: hide after 10 seconds
+      // Fallback: ซ่อนหลัง 10 วินาที
       setTimeout(() => {
-        hideLoadingScreen();
+        hideLoading();
         clearInterval(checkInterval);
       }, 10000);
     </script>

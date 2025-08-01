@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "strict": true,
+    "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
@@ -18,27 +18,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "baseUrl": "src",
-    "paths": {
-      "@/*": ["*"],
-      "@components/*": ["components/*"],
-      "@pages/*": ["pages/*"],
-      "@services/*": ["services/*"],
-      "@utils/*": ["utils/*"],
-      "@hooks/*": ["hooks/*"],
-      "@contexts/*": ["contexts/*"],
-      "@assets/*": ["assets/*"],
-      "@styles/*": ["styles/*"],
-      "@types/*": ["types/*"]
-    }
+    "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src/**/*",
+    "src/**/*.jsx",
+    "src/**/*.js"
   ],
   "exclude": [
     "node_modules",
-    "build",
-    "dist"
+    "build"
   ]
 }

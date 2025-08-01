@@ -1,75 +1,85 @@
 {
-  "name": "fitconnect-backend",
+  "name": "fitconnect-frontend",
   "version": "1.0.0",
-  "description": "FitConnect Backend API Server",
-  "main": "server/index.js",
-  "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "lint": "eslint server/ --ext .js",
-    "lint:fix": "eslint server/ --ext .js --fix",
-    "prettier": "prettier --write server/**/*.js",
-    "build": "echo 'No build step required for backend'",
-    "migrate": "node server/database/migrate.js",
-    "seed": "node server/database/seed.js",
-    "db:reset": "npm run migrate && npm run seed",
-    "production": "NODE_ENV=production node server/index.js",
-    "docker:build": "docker build -t fitconnect-backend .",
-    "docker:run": "docker run -p 3001:3001 fitconnect-backend"
-  },
+  "private": true,
+  "description": "FitConnect - แพลตฟอร์มค้นหาเทรนเนอร์ออกกำลังกาย",
+  "homepage": "https://absolutdee.github.io/PTThaiPlus",
+  "author": "FitConnect Team",
+  "license": "MIT",
   "keywords": [
     "fitness",
     "trainer",
-    "api",
-    "nodejs",
-    "express",
-    "mysql"
+    "thailand",
+    "health",
+    "exercise",
+    "personal-trainer"
   ],
-  "author": "FitConnect Team",
-  "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "compression": "^1.8.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.6.1",
-    "express": "^4.21.2",
-    "express-rate-limit": "^6.11.2",
-    "express-validator": "^7.0.1",
-    "helmet": "^7.2.0",
-    "joi": "^17.9.2",
-    "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
-    "mysql2": "^3.14.2",
-    "node-cron": "^3.0.2",
-    "nodemailer": "^6.9.4",
-    "sharp": "^0.32.4",
-    "socket.io": "^4.7.2",
-    "winston": "^3.10.0"
+    "@emotion/react": "^11.14.0",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "ajv": "^8.0.0",
+    "bootstrap": "^5.3.0",
+    "lucide-react": "^0.533.0",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0",
+    "react-scripts": "5.0.1",
+    "recharts": "^3.1.0",
+    "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.3",
-    "eslint": "^8.46.0",
-    "eslint-config-prettier": "^8.9.0",
-    "eslint-plugin-prettier": "^5.0.0",
-    "jest": "^29.6.2",
-    "nodemon": "^3.0.1",
-    "prettier": "^3.0.0",
-    "supertest": "^6.3.3"
+    "@babel/plugin-transform-private-property-in-object": "^7.22.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^24.1.0",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "eslint": "^8.0.0",
+    "eslint-config-react-app": "^7.0.1",
+    "prettier": "^2.8.0",
+    "sass": "^1.62.0",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'",
+    "deploy": "npm run build && gh-pages -d build",
+    "predeploy": "npm run build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-console": "off",
+      "react-hooks/exhaustive-deps": "warn"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "engines": {
     "node": ">=16.0.0",
     "npm": ">=8.0.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/absolutdee/PTThaiPlus.git"
-  },
-  "bugs": {
-    "url": "https://github.com/absolutdee/PTThaiPlus/issues"
-  },
-  "homepage": "https://github.com/absolutdee/PTThaiPlus#readme"
+  "proxy": "http://localhost:3001"
 }

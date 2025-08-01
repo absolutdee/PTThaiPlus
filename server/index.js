@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
-require('dotenv').config();
+require('dotenv').config({ path: './server/.env' });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -1010,10 +1010,11 @@ async function startServer() {
   const dbConnected = await initDatabase();
   
   // Start server
-  const server = app.listen(PORT, () => {
+  const server = app.listen(process.env.PORT || 3001, () => {
+     const actualPort = server.address().port;
     console.log('\n🎉 Server Started Successfully!');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log(`🌐 Server URL: http://localhost:${PORT}`);
+    console.log(`🌐 Server URL: http://localhost:${actualPort}`);
     console.log(`📊 Database: ${process.env.DB_DATABASE || 'fitconnect_db'}`);
     console.log(`🏃‍♂️ Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🔒 Security: ${process.env.NODE_ENV === 'production' ? 'Production' : 'Development'}`);
@@ -1040,12 +1041,12 @@ async function startServer() {
     console.log('   🔍 GET  /api/search/trainers  - Search trainers');
     
     console.log('\n🧪 Quick Tests:');
-    console.log(`   curl http://localhost:${PORT}/api/health`);
-    console.log(`   curl http://localhost:${PORT}/api/test`);
-    console.log(`   curl http://localhost:${PORT}/api/trainers/featured`);
+    console.log(`   curl http://localhost:${actualPort}/api/health`);
+    console.log(`   curl http://localhost:${actualPort}/api/test`);
+    console.log(`   curl http://localhost:${actualPort}/api/trainers/featured`);
     
     console.log('\n🔑 Test Login:');
-    console.log(`   curl -X POST http://localhost:${PORT}/api/auth/login \\`);
+    console.log(`   curl -X POST http://localhost:${actualPort}/api/auth/login \\`);
     console.log(`     -H "Content-Type: application/json" \\`);
     console.log(`     -d '{"email":"admin@fitconnect.com","password":"admin123"}'`);
     

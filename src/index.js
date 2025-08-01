@@ -1,50 +1,21 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext'; 
 
-// Import CSS safely
+// Import Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// Performance monitoring (optional) - แก้ไขให้ safe
-const reportWebVitals = (onPerfEntry) => {
-  if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(onPerfEntry);
-      getFID(onPerfEntry);
-      getFCP(onPerfEntry);
-      getLCP(onPerfEntry);
-      getTTFB(onPerfEntry);
-    }).catch(err => {
-      console.warn('Web Vitals not available:', err);
-    });
-  }
-};
-
-// Error handling for the entire app
+// Error handling
 window.addEventListener('error', (event) => {
-  console.error('Global Error:', event.error);
-  // Send to analytics if needed
-  if (window.gtag) {
-    window.gtag('event', 'exception', {
-      description: event.error.toString(),
-      fatal: false
-    });
-  }
+  console.error('Global error:', event.error);
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('Unhandled Promise Rejection:', event.reason);
-  // Send to analytics if needed
-  if (window.gtag) {
-    window.gtag('event', 'exception', {
-      description: event.reason.toString(),
-      fatal: false
-    });
-  }
+  console.error('Unhandled promise rejection:', event.reason);
 });
 
-// Safe DOM mounting
+// Safe mounting
 function mountApp() {
   const container = document.getElementById('root');
   
@@ -64,13 +35,12 @@ function mountApp() {
       </React.StrictMode>
     );
 
-    // Report performance metrics
-    reportWebVitals(console.log);
+    console.log('✅ FitConnect app mounted successfully');
 
   } catch (error) {
-    console.error('Failed to mount React app:', error);
+    console.error('❌ Failed to mount React app:', error);
     
-    // Fallback HTML content
+    // Fallback content
     container.innerHTML = `
       <div style="
         display: flex;
@@ -117,12 +87,11 @@ function mountApp() {
   }
 }
 
-// Wait for DOM to be ready
+// Mount when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', mountApp);
 } else {
   mountApp();
 }
 
-// Export for testing
 export default mountApp;
